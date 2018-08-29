@@ -1,6 +1,6 @@
 package edu.illinois.techservices.elmr;
 
-import static com.github.argherna.prefered.ApplicationConstants.EMPTY_BYTE_ARRAY;
+import static edu.illinois.techservices.elmr.ApplicationConstants.EMPTY_BYTE_ARRAY;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;

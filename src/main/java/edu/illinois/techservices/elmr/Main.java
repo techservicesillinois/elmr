@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.logging.Logger;
-
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -23,24 +22,24 @@ class Main {
     while (argIdx < args.length) {
       var arg = args[argIdx];
       switch (arg) {
-      case "-h":
-      case "--help":
-        showUsageAndExit(2);
-        break;
-      default:
-        if (arg.startsWith("-")) {
-          System.err.printf("Unknown option %s%n", arg);
-          showUsageAndExit(1);
-        } else {
-          try {
-            port = Integer.valueOf(arg);
-          } catch (NumberFormatException e) {
-            LOGGER.config(() -> String.format("%s is not a valid port number, defaulting to %d%n", arg,
-                DEFAULT_HTTP_SERVER_PORT));
-            port = DEFAULT_HTTP_SERVER_PORT;
+        case "-h":
+        case "--help":
+          showUsageAndExit(2);
+          break;
+        default:
+          if (arg.startsWith("-")) {
+            System.err.printf("Unknown option %s%n", arg);
+            showUsageAndExit(1);
+          } else {
+            try {
+              port = Integer.valueOf(arg);
+            } catch (NumberFormatException e) {
+              LOGGER.config(() -> String.format("%s is not a valid port number, defaulting to %d%n",
+                  arg, DEFAULT_HTTP_SERVER_PORT));
+              port = DEFAULT_HTTP_SERVER_PORT;
+            }
           }
-        }
-        break;
+          break;
       }
       argIdx++;
     }
@@ -52,6 +51,7 @@ class Main {
 
       List<Filter> readFilters = List.of();
       main.addHandler("/js", staticResourceHandler, readFilters);
+      main.addHandler("/login", new AttributeHandler(), readFilters);
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override
         public void run() {
@@ -77,8 +77,8 @@ class Main {
     System.err.println();
     System.err.println("Arguments:");
     System.err.println();
-    System.err.println(
-        "  port                   port the server will listen on (default is " + DEFAULT_HTTP_SERVER_PORT + ")");
+    System.err.println("  port             port the server will listen on (default is "
+        + DEFAULT_HTTP_SERVER_PORT + ")");
     System.err.println();
     System.err.println("Options:");
     System.err.println();

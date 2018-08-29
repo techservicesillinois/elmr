@@ -6,7 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Set;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,13 +21,13 @@ import org.w3c.dom.Text;
  * Use the following System properties to control formatting of output:
  *
  * <dl>
- * <dt>{@code com.github.argherna.prefered.HtmlRenderer.formattedHtml}
- * <dd>Set to {@code true} on the command line to format the output. Output is
- * indented. Default is {@code false};
- * <dt>{@code com.github.argherna.prefered.HtmlRenderer.indentSpaces}
+ * <dt>{@code edu.illinois.techservices.elmr.HtmlRenderer.formattedHtml}
+ * <dd>Set to {@code true} on the command line to format the output. Output is indented. Default is
+ * {@code false};
+ * <dt>{@code edu.illinois.techservices.elmr.HtmlRenderer.indentSpaces}
  * <dd>Set the number of spaces to indent the output. This is applied only if
- * {@code com.github.argherna.prefered.HtmlRenderer.formattedHtml} is
- * {@code true}. Default value is {@value #DEFAULT_INDENT_SPACES}.
+ * {@code edu.illinois.techservices.elmr.HtmlRenderer.formattedHtml} is {@code true}. Default value is
+ * {@value #DEFAULT_INDENT_SPACES}.
  * </dl>
  */
 class HtmlRenderer {
@@ -36,12 +35,11 @@ class HtmlRenderer {
   /**
    * Html5 tags that have both an open and close tag.
    */
-  private static final Set<String> CLOSED_TAGS = Set.of("html", "head", "body", "script", "div", "title", "section",
-      "h1");
+  private static final Set<String> CLOSED_TAGS =
+      Set.of("html", "head", "body", "script", "div", "title", "section", "h1");
 
   /**
-   * Html5 tags that are inline, meaning the contents will appear on the same line
-   * as the tags.
+   * Html5 tags that are inline, meaning the contents will appear on the same line as the tags.
    */
   private static final Set<String> INLINE_TAGS = Set.of("title", "h1");
 
@@ -52,19 +50,7 @@ class HtmlRenderer {
    */
   private static final Set<String> OPEN_PARENT_BLOCK_TAGS = Set.of("p");
 
-  /**
-   * Indicates output should be formatted.
-   */
-  private static final boolean FORMATTED_HTML = Boolean.getBoolean(HtmlRenderer.class.getName() + ".formattedHtml");
-
   private static final int DEFAULT_INDENT_SPACES = 2;
-
-  /**
-   * Number of spaces to indent children when formatting output. Default value is
-   * {@value #DEFAULT_INDENT_SPACES}.
-   */
-  private static final int INDENT_SPACES = Integer.getInteger(HtmlRenderer.class.getName() + ".indentSpaces",
-      DEFAULT_INDENT_SPACES);
 
   /**
    * Multiplier for number of spaces to indent children when formatting output.
@@ -93,7 +79,7 @@ class HtmlRenderer {
    */
   void render(Document doc, Writer w) throws IOException {
     w.write("<!DOCTYPE html>");
-    if (FORMATTED_HTML) {
+    if (hasFormattedHtml()) {
       w.write(System.getProperty("line.separator"));
     }
     NodeList kids = doc.getChildNodes();
@@ -106,7 +92,7 @@ class HtmlRenderer {
   }
 
   private void renderElement(Element e, Writer w) throws IOException {
-    if (FORMATTED_HTML && indentLevel > 0) {
+    if (hasFormattedHtml() && indentLevel > 0) {
       indent(w);
     }
     w.write('<');
@@ -119,7 +105,7 @@ class HtmlRenderer {
       }
     }
     w.write('>');
-    if (FORMATTED_HTML && !INLINE_TAGS.contains(e.getTagName())) {
+    if (hasFormattedHtml() && !INLINE_TAGS.contains(e.getTagName())) {
       w.write(System.getProperty("line.separator"));
     }
     NodeList kids = e.getChildNodes();
@@ -134,13 +120,13 @@ class HtmlRenderer {
     }
 
     if (CLOSED_TAGS.contains(e.getTagName())) {
-      if (FORMATTED_HTML && indentLevel > 0 && !INLINE_TAGS.contains(e.getTagName())) {
+      if (hasFormattedHtml() && indentLevel > 0 && !INLINE_TAGS.contains(e.getTagName())) {
         indent(w);
       }
       w.write("</");
       w.write(e.getTagName());
       w.write(">");
-      if (FORMATTED_HTML) {
+      if (hasFormattedHtml()) {
         w.write(System.getProperty("line.separator"));
       }
     }
@@ -153,14 +139,14 @@ class HtmlRenderer {
    * Writes spaces to the Writer.
    *
    * <p>
-   * <strong>Implementation Note:</strong> The number of spaces is calculated by
-   * multiplying the {@link #indentLevel} by the {@link #INDENT_SPACES}.
+   * <strong>Implementation Note:</strong> The number of spaces is calculated by multiplying the
+   * {@link #indentLevel} by the {@link #indentSpaces()}.
    *
    * @param w Writer for writing indent spaces to.
    * @throws IOException if an IOException occurs during writing.
    */
   private void indent(Writer w) throws IOException {
-    char[] spaces = new char[indentLevel * INDENT_SPACES];
+    char[] spaces = new char[indentLevel * indentSpaces()];
     Arrays.fill(spaces, ' ');
     w.write(spaces);
   }
@@ -173,12 +159,34 @@ class HtmlRenderer {
   }
 
   private void renderText(Text t, Writer w) throws IOException {
-    if (FORMATTED_HTML && OPEN_PARENT_BLOCK_TAGS.contains(t.getParentNode().getNodeName())) {
+    if (hasFormattedHtml() && OPEN_PARENT_BLOCK_TAGS.contains(t.getParentNode().getNodeName())) {
       indent(w);
     }
     w.write(t.getWholeText());
-    if (FORMATTED_HTML && OPEN_PARENT_BLOCK_TAGS.contains(t.getParentNode().getNodeName())) {
+    if (hasFormattedHtml() && OPEN_PARENT_BLOCK_TAGS.contains(t.getParentNode().getNodeName())) {
       w.write(System.getProperty("line.separator"));
     }
+  }
+
+  // NB: Live reads of system property values are better than static caching because system property
+  // values can be changed on the fly while the program is running. The JVM will automatically
+  // optimize calls to these methods if it has to.
+
+  /**
+   * Reads and returns the value of the
+   * {@code edu.illinois.techservices.elmr.HtmlRenderer.formattedHtml} system property.
+   */
+  static boolean hasFormattedHtml() {
+    return Boolean.getBoolean(HtmlRenderer.class.getName() + ".formattedHtml");
+  }
+
+  /**
+   * Reads and returns the value of the
+   * {@code edu.illinois.techservices.elmr.HtmlRenderer.indentSpaces} system property, returning
+   * {@value #DEFAULT_INDENT_SPACES} if not set.
+   */
+  static int indentSpaces() {
+    return Integer.getInteger(HtmlRenderer.class.getName() + ".indentSpaces",
+        DEFAULT_INDENT_SPACES);
   }
 }

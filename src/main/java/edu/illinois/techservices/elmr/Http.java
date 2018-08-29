@@ -1,7 +1,6 @@
 package edu.illinois.techservices.elmr;
 
 import static edu.illinois.techservices.elmr.ApplicationConstants.EMPTY_BYTE_ARRAY;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -10,12 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
 import com.sun.net.httpserver.HttpExchange;
 
 /**
- * Utilities for handling Http responses and performing Http text
- * transformations.
+ * Utilities for handling Http responses and performing Http text transformations.
  */
 final class Http {
 
@@ -33,8 +30,8 @@ final class Http {
    *
    * @throws IOException if an IOException occurs
    */
-  static void sendResponseWithLocationNoContent(HttpExchange exchange, HttpStatus status, ContentType contentType,
-      String location) throws IOException {
+  static void sendResponseWithLocationNoContent(HttpExchange exchange, HttpStatus status,
+      ContentType contentType, String location) throws IOException {
     var responseHeaders = new HashMap<String, List<String>>();
     addContentTypeResponseHeaders(responseHeaders, contentType);
     responseHeaders.put("Location", List.of(location));
@@ -54,8 +51,8 @@ final class Http {
    *
    * @throws IOException if an IOException occurs
    */
-  static void sendResponse(HttpExchange exchange, HttpStatus status, byte[] content, ContentType contentType)
-      throws IOException {
+  static void sendResponse(HttpExchange exchange, HttpStatus status, byte[] content,
+      ContentType contentType) throws IOException {
     var responseHeaders = new HashMap<String, List<String>>();
     addContentTypeResponseHeaders(responseHeaders, contentType);
     sendResponse(exchange, status, content, responseHeaders);
@@ -88,9 +85,8 @@ final class Http {
 
     // Avoid NPE when writing response by setting content length to -1 when
     // request method is HEAD or byte array is 0-length.
-    var length = exchange.getRequestMethod().equals("HEAD") || content.length == 0 || status == HttpStatus.NO_CONTENT
-        ? -1
-        : content.length;
+    var length = exchange.getRequestMethod().equals("HEAD") || content.length == 0
+        || status == HttpStatus.NO_CONTENT ? -1 : content.length;
     exchange.sendResponseHeaders(status.getStatusCode(), length);
 
     if (content.length > 0) {
@@ -104,13 +100,14 @@ final class Http {
   }
 
   /**
-   * Adds the given ContentType to the Map of response headers, appending the
-   * value if the ContentType is already set.
+   * Adds the given ContentType to the Map of response headers, appending the value if the
+   * ContentType is already set.
    *
    * @param contentType     the content type for the response
    * @param responseHeaders the names and values of the response headers.
    */
-  static void addContentTypeResponseHeaders(Map<String, List<String>> responseHeaders, ContentType contentType) {
+  static void addContentTypeResponseHeaders(Map<String, List<String>> responseHeaders,
+      ContentType contentType) {
     if (responseHeaders.containsKey("Content-Type")) {
       var values = new ArrayList<String>();
       values.addAll(responseHeaders.get("Content-Type"));
@@ -122,20 +119,21 @@ final class Http {
   }
 
   /**
-   * Simple utility that adds CORS headers to the response headers when the
-   * response content type is json and an ajax call is made.
+   * Simple utility that adds CORS headers to the response headers when the response content type is
+   * json and an ajax call is made.
    *
    * @param responseHeaders the names and values of the response headers.
    * @see <a href="https://www.w3.org/TR/cors/">CORS Specification</a>
    */
   static void addCorsToResponseHeaders(Map<String, List<String>> responseHeaders) {
     responseHeaders.put("Access-Control-Allow-Origin", List.of("*"));
-    responseHeaders.put("Access-Control-Allow-Headers", List.of("origin", "content-type", "accept"));
+    responseHeaders.put("Access-Control-Allow-Headers",
+        List.of("origin", "content-type", "accept"));
   }
 
   /**
-   * Converts the query String into a Map whose keys are the query parameter names
-   * and whose values are Lists of their Url-decoded values.
+   * Converts the query String into a Map whose keys are the query parameter names and whose values
+   * are Lists of their Url-decoded values.
    *
    * @param rawQuery query string from the Url, possibly url-encoded.
    */
@@ -144,13 +142,12 @@ final class Http {
   }
 
   /**
-   * Converts the query String into a Map whose keys are the query parameter names
-   * and whose values are Lists of their Url-decoded values.
+   * Converts the query String into a Map whose keys are the query parameter names and whose values
+   * are Lists of their Url-decoded values.
    *
    * @param rawQuery            query string from the Url, possibly url-encoded.
-   * @param parameterProcessors Map whose keys are parameter names and whose
-   *                            values are {@link Function}s that process the
-   *                            parameter values.
+   * @param parameterProcessors Map whose keys are parameter names and whose values are
+   *                            {@link Function}s that process the parameter values.
    */
   static Map<String, List<String>> queryToMap(String rawQuery,
       Map<String, Function<String, List<String>>> parameterProcessors) {
