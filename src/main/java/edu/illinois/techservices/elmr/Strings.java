@@ -3,7 +3,7 @@ package edu.illinois.techservices.elmr;
 /**
  * Utilities for String objects.
  */
-class Strings {
+public class Strings {
 
   private Strings() {
     // Empty constructor prevents instantiation.
@@ -14,7 +14,7 @@ class Strings {
    * 
    * @param s a String.
    */
-  static boolean notNullAndNotEmpty(String s) {
+  public static boolean notNullAndNotEmpty(String s) {
     return s != null && !s.isEmpty();
   }
 
@@ -24,7 +24,7 @@ class Strings {
    * 
    * @param key the String to normalize.
    */
-  static String normalize(String key) {
+  public static String normalize(String key) {
     if (key == null) {
       return null;
     }

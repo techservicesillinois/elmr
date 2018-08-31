@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-final class Json {
+public final class Json {
 
   private static final Logger LOGGER = Logger.getLogger(Json.class.getName());
 
@@ -41,13 +41,13 @@ final class Json {
     return hasValue;
   };
 
-  static String renderObject(Map<String, Object> object) throws IOException {
+  public static String renderObject(Map<String, Object> object) throws IOException {
     var buffer = new StringBuilder();
     renderObject(object, buffer);
     return buffer.toString();
   }
 
-  static String renderList(Iterable<? extends Object> values) throws IOException {
+  public static String renderList(Iterable<? extends Object> values) throws IOException {
     var buffer = new StringBuilder();
     renderList(values, buffer);
     return buffer.toString();

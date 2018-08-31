@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Content Type values.
  */
-enum ContentType {
+public enum ContentType {
 
   /**
    * Generic binary type.
@@ -37,7 +37,7 @@ enum ContentType {
     this.mimeType = mimeType;
   }
 
-  String mime() {
+  public String mime() {
     return mimeType;
   }
 
@@ -51,7 +51,7 @@ enum ContentType {
    * 
    * @param mime the MIME type.
    */
-  static ContentType getFromMime(String mime) {
+  public static ContentType getFromMime(String mime) {
     if (BY_MIME.containsKey(mime)) {
       return BY_MIME.get(mime);
     } else if (mime.startsWith("text/")) {
@@ -69,7 +69,7 @@ enum ContentType {
    * 
    * @param ext the file extension.
    */
-  static ContentType getFromExtension(String ext) {
+  public static ContentType getFromExtension(String ext) {
     if (BY_EXT.containsKey(ext)) {
       return BY_EXT.get(ext);
     } else {

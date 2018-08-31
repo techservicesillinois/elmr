@@ -16,24 +16,24 @@ import org.xml.sax.SAXException;
  * Reads a Shibboleth {@code attribute-map.xml} document.
  * 
  * <p>
- * By default, the application will read the file {@code /etc/shibboleth/attribute-map.xml}. But if
- * you set the system property {@code edu.illinois.techservices.elmr.AttributesMapReader.file} to a
+ * By default, the application will read the file {@value #DEFAULT_FILE_LOCATION}. But if you set
+ * the system property {@code edu.illinois.techservices.elmr.AttributesMapReader.file} to a
  * fully-qualified path, it will read it from there.
  */
-class AttributesMapReader implements AttributesReader {
+public class AttributesMapReader implements AttributesReader {
 
   private static final Logger LOGGER = Logger.getLogger(AttributesMapReader.class.getName());
 
   /**
    * The default location of the {@code attribute-map.xml} file.
    */
-  static final String DEFAULT_FILE_LOCATION = "/etc/shibboleth/attribute-map.xml";
+  public static final String DEFAULT_FILE_LOCATION = "/etc/shibboleth/attribute-map.xml";
 
   /**
    * Name of the system property for the file to override the default value of
    * {@value #DEFAULT_FILE_LOCATION}.
    */
-  static final String FILE_SYSPROP_NAME = AttributesMapReader.class.getName() + ".file";
+  public static final String FILE_SYSPROP_NAME = AttributesMapReader.class.getName() + ".file";
 
   /**
    * {@inheritDoc}
