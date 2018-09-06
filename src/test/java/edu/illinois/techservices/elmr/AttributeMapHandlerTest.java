@@ -1,18 +1,18 @@
 package edu.illinois.techservices.elmr;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.List;
+import javax.xml.parsers.SAXParserFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class AttributesMapReaderTest {
+class AttributeMapHandlerTest {
 
   private static final String TEMP_XML_FILE_NAME_PREFIX =
-      AttributesMapReaderTest.class.getName().replaceAll("\\.", "-");
+      AttributeMapHandlerTest.class.getName().replaceAll("\\.", "-");
 
   private static final String TEMP_XML_FILE_NAME_SUFFIX = ".xml";
 
@@ -121,15 +121,13 @@ class AttributesMapReaderTest {
 
   @Test
   void testReadingAttributeIds() {
+    var attributeMapHandler = new AttributeMapHandler();
     try {
-      AttributesReader ar = new AttributesMapReader();
-      List<String> ids = ar.getAttributeNamesFrom(xmlFilename);
-      assertTrue(ids.size() > 0);
-      assertTrue(ids.contains("eduPersonPrincipalName"));
-      assertTrue(ids.contains("eduPersonTargetedID"));
-      assertTrue(ids.contains("affiliation"));
-      assertTrue(ids.contains("eduPersonAffiliation"));
-      assertFalse(ids.contains("o"));
+      var parserFactory = SAXParserFactory.newInstance();
+      var parser = parserFactory.newSAXParser();
+      parser.parse(new File(xmlFilename), attributeMapHandler);
+      List<String> actual = attributeMapHandler.getAttributeNames();
+      assertTrue(actual.contains("eduPersonPrincipalName"));
     } catch (Exception e) {
       fail(e);
     }

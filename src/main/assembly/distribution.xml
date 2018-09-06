@@ -47,12 +47,6 @@
       <fileMode>640</fileMode>
       <directoryMode>755</directoryMode>
     </fileSet>
-    <fileSet>
-      <directory>src/main/webapp</directory>
-      <outputDirectory>web/elmr</outputDirectory>
-      <fileMode>640</fileMode>
-      <directoryMode>755</directoryMode>
-    </fileSet>
   </fileSets>
   <files>
     <file>
@@ -74,7 +68,6 @@
       <excludes>
         <exclude>commons-daemon:commons-daemon</exclude>
         <exclude>org.apache.tomcat:*</exclude>
-        <exclude>javax.servlet:*</exclude>
       </excludes>
     </dependencySet>
     <dependencySet>
