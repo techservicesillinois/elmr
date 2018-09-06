@@ -2,7 +2,7 @@
 
 HTTP Server that reads Shibboleth attributes from a request and persists them for use in an application session. When the session is finished, the attributes can be erased.
 
-elmr is packaged as a minimal [Tomcat 9](https://tomcat.apache.org/tomcat-9.0-doc/index.html) server. It can be started and stopped using the regular Tomcat scripts. See the section Running for more details. There is no packaged support for JSPs or clustering in this installation.
+elmr is packaged as a minimal [Tomcat 9](https://tomcat.apache.org/tomcat-9.0-doc/index.html) server. It can be started and stopped using the regular Tomcat scripts. See the section [Running](#running) for more details. There is no packaged support for JSPs or clustering in this installation.
 
 ## Requirements
 
@@ -30,7 +30,7 @@ Property | Description
 ---|---
 `edu.illinois.techservices.elmr.redis.CanConnect` | Used by `edu.illinois.techservices.elmr.SessionDataImplTests.java` to flag a connection to a locally running Redis instance can be connected to. Set to `true` to use the local redis instance or leave unset to not run the test.
 
-## Installation
+## Installing
 
 Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory tree will be a traditional Tomcat server tree:
 
@@ -48,7 +48,7 @@ Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory tre
     │           └── lib
     └── work
 
-## Configuration
+## Configuring
 
 It is recommended that configuration be set in the file `conf/Catalina/localhost/elmr.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. Logging is configured in `conf/logging.properties`.
 
@@ -66,9 +66,9 @@ System properties may be set at startup and will override any other configuratio
 
 Property | Description
 ---|---
-`edu.illinois.techservices.elmr.AttributeMapReader.file`| Fully qualified path to a Shibboleth `attribute-map.xml` file. If not set, the value will fall back to a context parameter of the same name (see below).
-`edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a context parameter of the same name (see below).
-`edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a context parameter of the same name (see below).
+`edu.illinois.techservices.elmr.AttributeMapReader.file`| Fully qualified path to a Shibboleth `attribute-map.xml` file. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
+`edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
+`edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 
 ### Setting Context Parameters in conf/Catalina/localhost/elmr.xml
 
@@ -80,13 +80,13 @@ Parameter Name | Description
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a default value of `localhost`.
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a default value of `6379`.
 
-### Configure Logging in conf/logging.properties
+### Configuring Logging in conf/logging.properties
 
 Logging uses the Tomcat default logging system (which is based on the JDK logging system). See [Tomcat Logging](https://tomcat.apache.org/tomcat-9.0-doc/logging.html) and for details.
 
 Loggers have been pre-configured to log at the highest level for each application package. Logs are configured by default to be written to `logs/localhost-yyyy-mm-dd.log` rolling them for 14 days.
 
-### Configure Apache HTTPD
+### Configuring Apache HTTPD
 
 There are 2 sample files you can use to configure `mod_jk`. You will be configuring attributes retrieved via `mod_shib` as environment variables. See the [Tomcat `mod_jk` documentation](https://tomcat.apache.org/connectors-doc/) for an overview of AJP and `mod_jk`
 
