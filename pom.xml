@@ -1,17 +1,23 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.illinois.techservices.elmr</groupId>
   <artifactId>elmr</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <properties>
+    <commons-daemon.version>1.1.0</commons-daemon.version>
+    <jedis.version>2.9.0</jedis.version>
+    <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
     <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
     <maven.compiler.source>10</maven.compiler.source>
     <maven.compiler.target>10</maven.compiler.target>
     <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
     <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+    <javax.servlet-api.version>4.0.0</javax.servlet-api.version>
     <junit.jupiter.version>5.2.0</junit.jupiter.version>
     <junit.platform.version>1.2.0</junit.platform.version>
+    <org.slf4j.version>1.7.22</org.slf4j.version>
+    <tomcat.version>9.0.11</tomcat.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
@@ -20,6 +26,90 @@
       <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit.jupiter.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>redis.clients</groupId>
+      <artifactId>jedis</artifactId>
+      <version>${jedis.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${org.slf4j.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <version>${org.slf4j.version}</version>
+      <type>jar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-daemon</groupId>
+      <artifactId>commons-daemon</artifactId>
+      <version>${commons-daemon.version}</version>
+      <scope>runtime</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>${javax.servlet-api.version}</version>
+      <scope>provided</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-annotations-api</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-api</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-catalina</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-coyote</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-juli</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>runtime</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-util-scan</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-util</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+      <type>jar</type>
     </dependency>
   </dependencies>
   <build>
@@ -59,6 +149,34 @@
             <version>${junit.platform.version}</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven-assembly-plugin.version}</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/tomcat-bootstrap.xml</descriptor>
+            <descriptor>src/main/assembly/distribution.xml</descriptor>
+          </descriptors>
+          <tarLongFileMode>posix</tarLongFileMode>
+          <archive>
+            <manifest>
+              <mainClass>org.apache.catalina.startup.Bootstrap</mainClass>
+            </manifest>
+            <manifestEntries>
+              <Class-Path>tomcat-juli.jar</Class-Path>
+            </manifestEntries>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
