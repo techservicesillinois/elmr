@@ -54,7 +54,7 @@ It is recommended that configuration be set in the file `conf/Catalina/localhost
 
 ### Configuring Tomcat in conf/server.xml
 
-See [Apache Tomcat 9 Configuration Reference, The Server Component](Apache Tomcat 9 Configuration Reference) for details on editing this file. It should be very minimal and contain an [AJP connector](https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html) on port 8009 (if available, you can use other ports if needed).
+See [Apache Tomcat 9 Configuration Reference, The Server Component](https://tomcat.apache.org/tomcat-9.0-doc/config/server.html) for details on editing this file. It should be very minimal and contain an [AJP connector](https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html) on port 8009 (if available, you can use other ports if needed).
 
 ### Setting JAVA_HOME in bin/setenv.sh
 
