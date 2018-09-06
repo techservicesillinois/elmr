@@ -1,6 +1,16 @@
 # elmr
 
-HTTP Server that reads headers from an authenticated request and persists them.
+HTTP Server that reads Shibboleth attributes from a request and persists them for use in an application session. When the session is finished, the attributes can be erased.
+
+elmr is packaged as a minimal [Tomcat 9](https://tomcat.apache.org/tomcat-9.0-doc/index.html) server. It can be started and stopped using the regular Tomcat scripts. See the section Running for more details. There is no packaged support for JSPs or clustering in this installation.
+
+## Requirements
+
+elmr is built and run on Java-10. Please make sure it is installed and can be used.
+
+elmr requires [Maven version 3.5.3](https://maven.apache.org/) (or newer) to be built.
+
+elmr requires an Apache httpd web server running with `mod_jk` and `mod_shib` installed and enabled. See below for configuration of both.
 
 ## Building
 
@@ -12,39 +22,101 @@ This project uses [Maven](https://maven.apache.org/) as its build system. From t
 
 This project uses [JUnit 5](https://junit.org/junit5/docs/current/user-guide/) as its test system. Tests will be run when the project is built, however to run tests while developing, the command below will work.
 
-    mvn clean test
+    mvn [sysprops] clean test
+
+System properties have to be set in order to run some tests as shown below.
+
+Property | Description 
+---|---
+`edu.illinois.techservices.elmr.redis.CanConnect` | Used by `edu.illinois.techservices.elmr.SessionDataImplTests.java` to flag a connection to a locally running Redis instance can be connected to. Set to `true` to use the local redis instance or leave unset to not run the test.
+
+## Installation
+
+Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory tree will be a traditional Tomcat server tree:
+
+    elmr
+    ├── bin
+    ├── conf
+    │   └── Catalina
+    │       └── localhost
+    ├── lib
+    ├── logs
+    ├── temp
+    ├── web
+    │   └── elmr
+    │       └── WEB-INF
+    │           └── lib
+    └── work
+
+## Configuration
+
+It is recommended that configuration be set in the file `conf/Catalina/localhost/elmr.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. Logging is configured in `conf/logging.properties`.
+
+### Configuring Tomcat in conf/server.xml
+
+See [Apache Tomcat 9 Configuration Reference, The Server Component](Apache Tomcat 9 Configuration Reference) for details on editing this file. It should be very minimal and contain an [AJP connector](https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html) on port 8009 (if available, you can use other ports if needed).
+
+### Setting JAVA_HOME in bin/setenv.sh
+
+If you are using a custom installation of Java-10 in a non-default location, set the `JAVA_HOME` environment variable in `bin/setenv.sh` to point to the base directory of your JDK or JRE install.
+
+### Setting System Properties in bin/setenv.sh
+
+System properties may be set at startup and will override any other configuration that is set as described in the subsequent subsections. They must be set in `bin/setenv.sh` in the `CATALINA_OPTS` environment variable. The table below lists what properties the application can accept outside the regular JVM system properties. See [RUNNING.TXT](https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt) for other variables you can set.
+
+Property | Description
+---|---
+`edu.illinois.techservices.elmr.AttributeMapReader.file`| Fully qualified path to a Shibboleth `attribute-map.xml` file. If not set, the value will fall back to a context parameter of the same name (see below).
+`edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a context parameter of the same name (see below).
+`edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a context parameter of the same name (see below).
+
+### Setting Context Parameters in conf/Catalina/localhost/elmr.xml
+
+Context parameters are read when the Tomcat server is started from the `conf/Catalina/localhost/elmr.xml` (there is no `webapps/elmr/WEB-INF/web.xml` file in this application). See [Tomcat Context Parameters](https://tomcat.apache.org/tomcat-9.0-doc/config/context.html#Context_Parameters) for how these work and how they replace elements in a traditional `web.xml` file. Edit the `value` attributes of the `<Parameter>` elements as follows:
+
+Parameter Name | Description
+---|---
+`edu.illinois.techservices.elmr.AttributeMapReader.file`| Fully qualified path to a Shibboleth `attribute-map.xml` file. If not set, the value will fall back to a default value of `/etc/shibboleth/attribute-map.xml`.
+`edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a default value of `localhost`.
+`edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a default value of `6379`.
+
+### Configure Logging in conf/logging.properties
+
+Logging uses the Tomcat default logging system (which is based on the JDK logging system). See [Tomcat Logging](https://tomcat.apache.org/tomcat-9.0-doc/logging.html) and for details.
+
+Loggers have been pre-configured to log at the highest level for each application package. Logs are configured by default to be written to `logs/localhost-yyyy-mm-dd.log` rolling them for 14 days.
+
+### Configure Apache HTTPD
+
+There are 2 sample files you can use to configure `mod_jk`. You will be configuring attributes retrieved via `mod_shib` as environment variables. See the [Tomcat `mod_jk` documentation](https://tomcat.apache.org/connectors-doc/) for an overview of AJP and `mod_jk`
+
+#### conf/mod_jk.conf
+
+Use the contents of this file to configure:
+
+1. Which Shibboleth attributes to expose as `JkEnvVar`s.
+1. Which paths will be routed through `mod_jk` as `JkMount`s.
+1. Which paths will be protected via Shibboleth via `<Location>` directives.
+
+#### conf/worker.properties
+
+Copy this file to a location configured in your httpd's configuration. Edit as appropriate. See the [`workers.properties` reference](https://tomcat.apache.org/connectors-doc/reference/workers.html) for contents. For elmr, this ought to be a minimal configuration.
 
 ## Running
 
-Run the jar file:
+### Starting
 
-    java [system properties] -jar elmr.jar [args]
+Run the file `elmr/bin/startup.sh` to start the server. Tomcat will log messages to `elmr/logs/catalina.out` for startup and `elmr/logs/localhost-yyyy-mm-dd.log` about application startup.
 
-Logging is based on JDK logging and output to the console by default. You can set the logging configuration to use by specifying the `java.util.logging.config.file` system property. Press `^C` to stop the server.
+### Stopping
 
-Arguments & options can be supplied on the command line to run the server:
-
-```
-Usage: edu.illinois.techservices.elmr.Main [port]|[Options]
-
-Integration Server for Authentication.
-
-Arguments:
-
-  port                   port the server will listen on (default is 8088)
-
-Options:
-
-  -h, --help       Show this help and exit
-```
-
-When you start the server, you can navigate to `http://localhost:8088/` (or to whatever port you set on startup) after starting the server.
+Run the file `elmr/bin/shutdown.sh` to stop the server. Tomcat will log messages to `elmr/logs/catalina.out` for shutdown.
 
 ## Troubleshooting
 
-### Problem: Server was started with custom file location, but returns nothing
+### Application Does Not Run
 
-Make sure you entered the system property name and file name correctly on the command line. If either is mistyped, the XML will not be loaded and processed.
+If the web application is not running, check `elmr/logs/catalina.out` for any log messages logged at `SEVERE` and look for anything related to `elmr` not starting. You will then check `elmr/logs/localhost-yyyy-mm-dd.log` for messages and stack traces for any unhandled exceptions.
 
 ## Etymology
 
