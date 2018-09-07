@@ -10,7 +10,7 @@ elmr is built and run on Java-10. Please make sure it is installed and can be us
 
 elmr requires [Maven version 3.5.3](https://maven.apache.org/) (or newer) to be built.
 
-elmr requires an Apache httpd web server running with `mod_jk` and `mod_shib` installed and enabled. See below for configuration of both.
+elmr requires an Apache httpd web server running with `mod_jk` and `mod_shib` installed and enabled. [See below](#configuring-apache-httpd) for configuration of both.
 
 ## Building
 
@@ -35,34 +35,43 @@ Property | Description
 Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory tree will be a traditional Tomcat server tree:
 
     elmr
-    ├── bin
-    ├── conf
+    ├── bin                (control scripts)
+    ├── conf               (server wide configuration)
     │   └── Catalina
-    │       └── localhost
-    ├── lib
+    │       └── localhost  (web application configuration)
+    ├── lib                (Tomcat server libraries)
     ├── logs
     ├── temp
-    ├── web
+    ├── webapps            
     │   └── elmr
     │       └── WEB-INF
-    │           └── lib
+    │           └── lib    (elmr web application libraries)
     └── work
 
 ## Configuring
 
-It is recommended that configuration be set in the file `conf/Catalina/localhost/elmr.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. Logging is configured in `conf/logging.properties`.
+There are 6 configuration components:
+
+1. `bin/setenv/sh`
+1. `conf/server.xml`
+1. `conf/Catalina/localhost/elmr.xml`
+1. `conf/logging.properties`
+1. `conf/mod_jk.conf`
+1. `conf/workers.properties`
+
+It is recommended that web application configuration be set in the file `conf/Catalina/localhost/elmr.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. Logging is configured in `conf/logging.properties`.
 
 ### Configuring Tomcat in conf/server.xml
 
-See [Apache Tomcat 9 Configuration Reference, The Server Component](https://tomcat.apache.org/tomcat-9.0-doc/config/server.html) for details on editing this file. It should be very minimal and contain an [AJP connector](https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html) on port 8009 (if available, you can use other ports if needed).
+See [Apache Tomcat 9 Configuration Reference, The Server Component](https://tomcat.apache.org/tomcat-9.0-doc/config/server.html) for details on editing this file. It should be very minimal and contain an [AJP connector](https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html) on port 8009 (if available, you can use other ports if needed). By default, an HTTP connector on port 8080 and AJP connector on port 8009 are configured. Remove the HTTP connector for production installations.
 
 ### Setting JAVA_HOME in bin/setenv.sh
 
-If you are using a custom installation of Java-10 in a non-default location, set the `JAVA_HOME` environment variable in `bin/setenv.sh` to point to the base directory of your JDK or JRE install.
+If you are using a custom installation of Java-10 in a non-default location, set the `JAVA_HOME` environment variable in `bin/setenv.sh` to point to the base directory of your JDK or JRE install. See [RUNNING.TXT](https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt) for other environment variables you can set.
 
 ### Setting System Properties in bin/setenv.sh
 
-System properties may be set at startup and will override any other configuration that is set as described in the subsequent subsections. They must be set in `bin/setenv.sh` in the `CATALINA_OPTS` environment variable. The table below lists what properties the application can accept outside the regular JVM system properties. See [RUNNING.TXT](https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt) for other variables you can set.
+System properties may be set at startup and will override any other configuration that is set as described in the [subsequent subsections](#setting-context-parameters-in-confcatalinalocalhostelmrxml). They must be set in `bin/setenv.sh` by the `CATALINA_OPTS` environment variable. The table below lists what properties the application can accept outside the regular JVM system properties. See [RUNNING.TXT](https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt) for other environment variables you can set.
 
 Property | Description
 ---|---
@@ -103,6 +112,8 @@ Use the contents of this file to configure:
 Copy this file to a location configured in your httpd's configuration. Edit as appropriate. See the [`workers.properties` reference](https://tomcat.apache.org/connectors-doc/reference/workers.html) for contents. For elmr, this ought to be a minimal configuration.
 
 ## Running
+
+For general information about running a Tomcat server, see [RUNNING.TXT](https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt). These instructions are provided here to get you started with the basic elmr configuration.
 
 ### Starting
 
