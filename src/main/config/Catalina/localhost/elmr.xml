@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-  <Parameter name="edu.illinois.techservices.elmr.AttributeMapReader.file" value="">
+  <Parameter name="edu.illinois.techservices.elmr.AttributeMapReader.file" value=""/>
   <Parameter name="edu.illinois.techservices.elmr.SessionData.hostname" value="localhost" />
   <Parameter name="edu.illinois.techservices.elmr.SessionData.port" value="1234" />
+  <Parameter name="edu.illinois.techservices.elmr.servlets.ApacheConfigFile" value="elmr/conf/mod_jk.conf" />
 </Context>

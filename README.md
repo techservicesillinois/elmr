@@ -52,12 +52,12 @@ Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory tre
 
 There are 6 configuration components:
 
-1. `bin/setenv/sh`
-1. `conf/server.xml`
-1. `conf/Catalina/localhost/elmr.xml`
-1. `conf/logging.properties`
-1. `conf/mod_jk.conf`
-1. `conf/workers.properties`
+1. `bin/setenv.sh` for system properties.
+1. `conf/server.xml` for Tomcat server-wide configuration.
+1. `conf/Catalina/localhost/elmr.xml` for elmr web application configuration (do not use `web.xml`).
+1. `conf/logging.properties` for `java.util.logging`/`org.apache.tomcat.juli` configuration.
+1. `conf/mod_jk.conf` for configuring the connection between Apache + Shibboleth and Tomcat.
+1. `conf/workers.properties` for configuring the connection between Apache and Tomcat. 
 
 It is recommended that web application configuration be set in the file `conf/Catalina/localhost/elmr.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. Logging is configured in `conf/logging.properties`.
 
@@ -78,6 +78,9 @@ Property | Description
 `edu.illinois.techservices.elmr.AttributeMapReader.file`| Fully qualified path to a Shibboleth `attribute-map.xml` file. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
+`edu.illinois.techservices.elmr.servlets.HtmlRenderer.formattedHtml` | When set to `true`, format output HTML in an indented readable format. This should only be set for development and debugging purposes.
+`edu.illinois.techservices.elmr.servlets.HtmlRenderer.indentSpaces` | When set with the above property, use this value for the indent spaces. The default value is `2`.
+
 
 ### Setting Context Parameters in conf/Catalina/localhost/elmr.xml
 
@@ -128,6 +131,10 @@ Run the file `elmr/bin/shutdown.sh` to stop the server. Tomcat will log messages
 ### Application Does Not Run
 
 If the web application is not running, check `elmr/logs/catalina.out` for any log messages logged at `SEVERE` and look for anything related to `elmr` not starting. You will then check `elmr/logs/localhost-yyyy-mm-dd.log` for messages and stack traces for any unhandled exceptions.
+
+### Attributes Are Not Visible in the Application
+
+If there are Shibboleth attributes that you expect to be visible in your application but are not showing up, you will have to review the JkEnvVars set in your Apache configuration and the attributes you set in your Shibboleth attribute map. These can be seen by visiting the `/elmr/config` page which will show what has been configured.
 
 ## Etymology
 

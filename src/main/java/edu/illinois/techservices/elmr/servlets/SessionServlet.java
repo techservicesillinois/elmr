@@ -69,7 +69,7 @@ public class SessionServlet extends HttpServlet {
       throws IOException, ServletException {
 
     @SuppressWarnings("unchecked")
-    List<String> userAttributes = (List<String>) request.getServletContext()
+    List<String> userAttributes = (List<String>) getServletContext()
         .getAttribute(AttributeMapContextListener.class.getPackageName() + ".attributes");
 
     // Generate a Map with attribute names as keys and Shibboleth attribute values as values.
@@ -85,7 +85,7 @@ public class SessionServlet extends HttpServlet {
     if (output.size() <= 0) {
       response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     } else {
-      var sd = (SessionData) request.getServletContext()
+      var sd = (SessionData) getServletContext()
           .getAttribute(SessionDataContextListener.class.getPackageName() + ".sessionData");
       Objects.requireNonNull(sd, "SessionData implementation is null!");
       var json = Json.renderObject(output);
@@ -97,7 +97,7 @@ public class SessionServlet extends HttpServlet {
 
   private void destroySession(HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
-    var sd = (SessionData) request.getServletContext()
+    var sd = (SessionData) getServletContext()
         .getAttribute(SessionDataContextListener.class.getPackageName() + ".sessionData");
     Objects.requireNonNull(sd, "SessionData implementation is null!");
     Cookie[] cookies = request.getCookies();
