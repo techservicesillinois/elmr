@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
  * SessionData implementation connecting to a Redis store.
@@ -20,11 +21,13 @@ public class SessionDataImpl implements SessionData {
 
   private final CacheKey cacheKey = new SecureRandomCacheKey();
 
+  private final SessionData fallbackImpl;
+
   /**
    * Connects to a Redis store at {@value #DEFAULT_HOSTNAME} on port {@value #DEFAULT_PORT}.
    */
   public SessionDataImpl() {
-    this(DEFAULT_HOSTNAME, DEFAULT_PORT);
+    this(DEFAULT_HOSTNAME, DEFAULT_PORT, new InMemorySessionData());
   }
 
   /**
@@ -33,7 +36,8 @@ public class SessionDataImpl implements SessionData {
    * @param hostname host of the Redis store.
    * @param port     Redis port.
    */
-  public SessionDataImpl(String hostname, int port) {
+  public SessionDataImpl(String hostname, int port, SessionData fallbackImpl) {
+    this.fallbackImpl = fallbackImpl;
     jp = new JedisPool(new JedisPoolConfig(), hostname, port);
     LOGGER.config("Constructed " + SessionDataImpl.class.getName() + " with hostname = " + hostname
         + ", port = " + port);
@@ -61,6 +65,9 @@ public class SessionDataImpl implements SessionData {
     String key = cacheKey.generate();
     try (Jedis j = jp.getResource()) {
       j.set(key, sessionData);
+    } catch (JedisConnectionException e) {
+      LOGGER.warning("Failed to connect to redis! Using fallback implementation!");
+      return fallbackImpl.save(sessionData);
     }
     return cacheKey.encode(key);
   }
@@ -73,6 +80,9 @@ public class SessionDataImpl implements SessionData {
     String sessionData = null;
     try (Jedis j = jp.getResource()) {
       sessionData = j.get(decodedKey);
+    } catch (JedisConnectionException e) {
+      LOGGER.warning("Failed to connect to redis! Using fallback implementation!");
+      return fallbackImpl.get(key);
     }
     return sessionData;
   }
@@ -84,6 +94,9 @@ public class SessionDataImpl implements SessionData {
     String decodedKey = cacheKey.decode(key);
     try (Jedis j = jp.getResource()) {
       j.del(decodedKey);
+    } catch (JedisConnectionException e) {
+      LOGGER.warning("Failed to connect to redis! Using fallback implmentation!");
+      fallbackImpl.destroy(key);
     }
   }
 }

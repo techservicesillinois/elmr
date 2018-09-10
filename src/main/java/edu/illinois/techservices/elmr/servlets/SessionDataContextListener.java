@@ -79,18 +79,8 @@ public class SessionDataContextListener implements ServletContextListener {
       }
     }
 
-    SessionData sd = null;
-
-    try {
-      sd = (hostname == null || hostname.isEmpty()) ? new SessionDataImpl()
-          : new SessionDataImpl(hostname, port);
-    } catch (Exception e) {
-      if (e.getCause() instanceof ConnectException) {
-        LOGGER.warning(
-            "Failed to connect to external datasource! Replacing SessionData with an in-memory implementation.");
-        sd = new InMemorySessionData();
-      }
-    }
+    SessionData sd = (hostname == null || hostname.isEmpty()) ? new SessionDataImpl()
+        : new SessionDataImpl(hostname, port, new InMemorySessionData());
     sce.getServletContext()
         .setAttribute(SessionDataContextListener.class.getPackageName() + ".sessionData", sd);
     LOGGER.config("SessionData object configured; access with context property "
