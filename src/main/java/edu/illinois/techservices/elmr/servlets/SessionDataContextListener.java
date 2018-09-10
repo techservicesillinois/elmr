@@ -1,6 +1,5 @@
 package edu.illinois.techservices.elmr.servlets;
 
-import java.net.ConnectException;
 import java.util.logging.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
