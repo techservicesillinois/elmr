@@ -136,6 +136,17 @@ If the web application is not running, check `elmr/logs/catalina.out` for any lo
 
 If there are Shibboleth attributes that you expect to be visible in your application but are not showing up, you will have to review the JkEnvVars set in your Apache configuration and the attributes you set in your Shibboleth attribute map. These can be seen by visiting the `/elmr/config` page which will show what has been configured.
 
+### Apache (not Tomcat) Responds to Requests with 413 Status
+
+The [413 status](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413) signals that Shibboleth (or other mechanism) on the Apache side is trying to process a request containing an entity (header, attribute, etc) that exceeds its configured capacity. Fix this by doing the following:
+
+1. Edit `workers.properties` adding the line `worker.[worker-name].max_packet_size=65536`. Restart Apache.
+1. Edit `elmr/conf/server.xml` adding the attribute `packetSize=65536` to the AJP `<Connector>`. Restart Tomcat.
+
+It is important that the values for `max_packet_size` and `packetSize` are the same. It's OK to set it this high. This isn't configured by default for any of the examples in the source. When this is done, the request will go through. 
+
+See the [`workers.properties` reference](https://tomcat.apache.org/connectors-doc/reference/workers.html) and the [AJP Connector reference](https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html#Standard_Implementations) documentation for details.
+
 ## Etymology
 
 The name is a play on a certain brand of glue found in school children's desks. It was chosen because the purpose for this server is mostly integration sometimes referred to as "glue" code.
