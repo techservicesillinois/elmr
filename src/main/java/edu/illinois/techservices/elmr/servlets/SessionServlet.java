@@ -104,6 +104,7 @@ public class SessionServlet extends HttpServlet {
       if (c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)) {
         byte[] key = c.getValue().getBytes();
         sd.destroy(key);
+        c.setMaxAge(0);
         break;
       }
     }
