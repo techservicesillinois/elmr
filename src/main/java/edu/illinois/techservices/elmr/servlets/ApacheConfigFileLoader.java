@@ -22,7 +22,7 @@ import javax.servlet.annotation.WebListener;
  * 
  * <p>
  * If the file cannot be found, rather than fail the startup, this listener will load an empty
- * configuration and empty values will be returned from it. 
+ * configuration and empty values will be returned from it.
  */
 @WebListener
 public class ApacheConfigFileLoader implements ServletContextListener {
@@ -34,21 +34,21 @@ public class ApacheConfigFileLoader implements ServletContextListener {
     LOGGER.config("Initializing data from Apache config file...");
 
     var apacheConfigFilename =
-        System.getProperty(ConfigServlet.class.getPackageName() + ".ApacheConfigFile");
+        System.getProperty(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
     if (apacheConfigFilename == null || apacheConfigFilename.isEmpty()) {
       apacheConfigFilename = sce.getServletContext()
-          .getInitParameter(ConfigServlet.class.getPackageName() + ".ApacheConfigFile");
+          .getInitParameter(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
       if (apacheConfigFilename == null || apacheConfigFilename.isEmpty()) {
-        LOGGER.warning(ConfigServlet.class.getPackageName()
-            + ".ApacheConfigFile  was not set as a system property or context parameter. File will not be loaded.");
+        LOGGER.warning(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME
+            + " was not set as a system property or context parameter. File will not be loaded.");
 
       } else {
         LOGGER.config("Reading file set by context parameter "
-            + ConfigServlet.class.getPackageName() + ".ApacheConfigFile");
+            + PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
       }
     } else {
-      LOGGER.config("Reading file set by system property " + ConfigServlet.class.getPackageName()
-          + ".ApacheConfigFile");
+      LOGGER.config("Reading file set by system property "
+          + PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
     }
 
     ApacheConfig acf = null;
@@ -61,9 +61,9 @@ public class ApacheConfigFileLoader implements ServletContextListener {
       acf = new ApacheConfig(new ByteArrayInputStream(new byte[0]));
     }
 
-    sce.getServletContext()
-        .setAttribute(ApacheConfigFileLoader.class.getPackageName() + ".ApacheConfig", acf);
+    sce.getServletContext().setAttribute(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME,
+        acf);
     LOGGER.config("Apache configuration cached; access with context property "
-        + ApacheConfigFileLoader.class.getPackageName() + ".ApacheConfig");
+        + PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
   }
 }

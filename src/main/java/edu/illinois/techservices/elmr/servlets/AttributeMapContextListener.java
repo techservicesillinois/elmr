@@ -69,10 +69,9 @@ public class AttributeMapContextListener implements ServletContextListener {
           e);
       throw new RuntimeException(e);
     }
-    sce.getServletContext().setAttribute(
-        AttributeMapContextListener.class.getPackageName() + ".attributes",
+    sce.getServletContext().setAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME,
         Collections.unmodifiableList(amh.getAttributeNames()));
     LOGGER.config("Attributes cached; access with context property "
-        + AttributeMapContextListener.class.getPackageName() + ".attributes");
+        + PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
   }
 }

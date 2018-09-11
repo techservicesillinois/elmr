@@ -49,7 +49,7 @@ public class SessionServlet extends HttpServlet {
     if (location == null) {
       Cookie[] cookies = request.getCookies();
       for (Cookie c : cookies) {
-        if (c.getName().equals("__edu.illinois.techservices.elmr.serviceUrl")) {
+        if (c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)) {
           location = c.getValue();
           break;
         }
@@ -58,8 +58,8 @@ public class SessionServlet extends HttpServlet {
     if (location == null) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST,
           "Redirect back to service was not set. "
-              + "Set either a Location header or a cookie with the name "
-              + "'__edu.illinois.techservices.elmr.serviceUrl'.");
+              + "Set either a Location header or a cookie with the name '"
+              + PackageConstants.SERVICE_URL_COOKIE_NAME + "'.");
     } else {
       response.sendRedirect(location);
     }
@@ -70,7 +70,7 @@ public class SessionServlet extends HttpServlet {
 
     @SuppressWarnings("unchecked")
     List<String> userAttributes = (List<String>) getServletContext()
-        .getAttribute(AttributeMapContextListener.class.getPackageName() + ".attributes");
+        .getAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
 
     // Generate a Map with attribute names as keys and Shibboleth attribute values as values.
     Map<String, Object> output =
@@ -86,23 +86,22 @@ public class SessionServlet extends HttpServlet {
       response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     } else {
       var sd = (SessionData) getServletContext()
-          .getAttribute(SessionDataContextListener.class.getPackageName() + ".sessionData");
+          .getAttribute(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
       Objects.requireNonNull(sd, "SessionData implementation is null!");
       var json = Json.renderObject(output);
       var key = sd.save(json);
-      response.addCookie(new Cookie("__" + SessionServlet.class.getPackageName() + ".sessionKey",
-          new String(key)));
+      response.addCookie(new Cookie(PackageConstants.SESSION_KEY_COOKIE_NAME, new String(key)));
     }
   }
 
   private void destroySession(HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
     var sd = (SessionData) getServletContext()
-        .getAttribute(SessionDataContextListener.class.getPackageName() + ".sessionData");
+        .getAttribute(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
     Objects.requireNonNull(sd, "SessionData implementation is null!");
     Cookie[] cookies = request.getCookies();
     for (Cookie c : cookies) {
-      if (c.getName().equals("__" + SessionServlet.class.getPackageName() + ".sessionKey")) {
+      if (c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)) {
         byte[] key = c.getValue().getBytes();
         sd.destroy(key);
         break;

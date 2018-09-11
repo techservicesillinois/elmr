@@ -7,7 +7,7 @@
     <Connector executor="elmrThreadPool" port="8080" protocol="HTTP/1.1" connectionTimeout="20000" />
     <Connector executor="elmrThreadPool" port="8009" protocol="AJP/1.3" tomcatAuthentication="false" />
     <Engine name="Catalina" defaultHost="localhost">
-      <Host name="localhost" appBase="web" unpackWARs="true" autoDeploy="true">
+      <Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="true">
       </Host>
     </Engine>
   </Service>
