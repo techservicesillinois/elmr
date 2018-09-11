@@ -78,6 +78,7 @@ Property | Description
 `edu.illinois.techservices.elmr.AttributeMapReader.file`| Fully qualified path to a Shibboleth `attribute-map.xml` file. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
+`edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.servlets.HtmlRenderer.formattedHtml` | When set to `true`, format output HTML in an indented readable format. This should only be set for development and debugging purposes.
 `edu.illinois.techservices.elmr.servlets.HtmlRenderer.indentSpaces` | When set with the above property, use this value for the indent spaces. The default value is `2`.
 
@@ -91,6 +92,7 @@ Parameter Name | Description
 `edu.illinois.techservices.elmr.AttributeMapReader.file`| Fully qualified path to a Shibboleth `attribute-map.xml` file. If not set, the value will fall back to a default value of `/etc/shibboleth/attribute-map.xml`.
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a default value of `localhost`.
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a default value of `6379`.
+`edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the file will not load and elmr will not recognize that anything in Apache is configured.
 
 ### Configuring Logging in conf/logging.properties
 
