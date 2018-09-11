@@ -140,3 +140,6 @@ buildNumber.properties
 
 ### JShell ###
 *.jsh
+
+### DSStore ###
+.DS_Store
