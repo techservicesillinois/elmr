@@ -15,6 +15,9 @@ public final class InMemorySessionData implements SessionData {
   @Override
   public byte[] save(String sessionData) {
     String key = cacheKey.generate();
+    while (data.containsKey(key)) {
+      key = cacheKey.generate();
+    }
     data.put(key, sessionData);
     return cacheKey.encode(key);
   }

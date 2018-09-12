@@ -64,6 +64,11 @@ public class SessionDataImpl implements SessionData {
   private byte[] doSaveReturningKey(String sessionData) {
     String key = cacheKey.generate();
     try (Jedis j = jp.getResource()) {
+      // Key generation is random but not perfect so make sure a key that doesn't already exist is
+      // generated.
+      while (j.exists(key)) {
+        key = cacheKey.generate();
+      }
       j.set(key, sessionData);
     } catch (JedisConnectionException e) {
       LOGGER.warning("Failed to connect to redis! Using fallback implementation!");
