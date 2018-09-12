@@ -28,11 +28,11 @@ System properties have to be set in order to run some tests as shown below.
 
 Property | Description 
 ---|---
-`edu.illinois.techservices.elmr.redis.CanConnect` | Used by `edu.illinois.techservices.elmr.SessionDataImplTests.java` to flag a connection to a locally running Redis instance can be connected to. Set to `true` to use the local redis instance or leave unset to not run the test.
+`edu.illinois.techservices.elmr.redis.CanConnect` | Used by `edu.illinois.techservices.elmr.SessionDataImplTests` to flag a connection to a locally running Redis instance can be connected to. Set to `true` to use the local redis instance or leave unset to not run the test.
 
 ## Installing
 
-Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory tree will be a traditional Tomcat server tree:
+Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory structure will be a traditional Tomcat server tree:
 
     elmr
     ├── bin                (control scripts)
@@ -98,11 +98,13 @@ Parameter Name | Description
 
 Logging uses the Tomcat default logging system (which is based on the JDK logging system). See [Tomcat Logging](https://tomcat.apache.org/tomcat-9.0-doc/logging.html) and for details.
 
-Loggers have been pre-configured to log at the highest level for each application package. Logs are configured by default to be written to `logs/localhost-yyyy-mm-dd.log` rolling them for 14 days.
+Loggers have been pre-configured to log at the highest level for each application package. Logs are configured by default to be written to `logs/localhost-yyyy-mm-dd.log` rolling them for 14 days. The application code will write some debugging and error messages to the log so they are useful for diagnosing issues during runtime.
 
 ### Configuring Apache HTTPD
 
-There are 2 sample files you can use to configure `mod_jk`. You will be configuring attributes retrieved via `mod_shib` as environment variables. See the [Tomcat `mod_jk` documentation](https://tomcat.apache.org/connectors-doc/) for an overview of AJP and `mod_jk`
+There are 2 sample files you can use to configure `mod_jk`. You will be configuring attributes retrieved via `mod_shib` as environment variables. See the [Tomcat `mod_jk` documentation](https://tomcat.apache.org/connectors-doc/) for an overview of AJP and `mod_jk`.
+
+It is recommended that `/elmr/session` and `/elmr/config` be configured to force Shibboleth authentication. The `/elmr/session` resource saves or destroys session data. The `/elmr/config` resource displays information about how elmr is configured and must not be visible to the general public.
 
 #### conf/mod_jk.conf
 
@@ -122,7 +124,7 @@ For general information about running a Tomcat server, see [RUNNING.TXT](https:/
 
 ### Starting
 
-Run the file `elmr/bin/startup.sh` to start the server. Tomcat will log messages to `elmr/logs/catalina.out` for startup and `elmr/logs/localhost-yyyy-mm-dd.log` about application startup.
+Run the file `elmr/bin/startup.sh` to start the server. Tomcat will log messages to `elmr/logs/catalina.out` for startup and `elmr/logs/localhost-yyyy-mm-dd.log` about application startup and operation.
 
 ### Stopping
 
@@ -132,7 +134,7 @@ Run the file `elmr/bin/shutdown.sh` to stop the server. Tomcat will log messages
 
 ### Application Does Not Run
 
-If the web application is not running, check `elmr/logs/catalina.out` for any log messages logged at `SEVERE` and look for anything related to `elmr` not starting. You will then check `elmr/logs/localhost-yyyy-mm-dd.log` for messages and stack traces for any unhandled exceptions.
+If the web application is not running, check `elmr/logs/catalina.out` for any log messages logged at `SEVERE` and look for anything related to `elmr` not starting. You will then check `elmr/logs/localhost-yyyy-mm-dd.log` for messages and stack traces for any unhandled exceptions. When errors occur, they will usually be when application listeners are started and data is being cached.
 
 ### Attributes Are Not Visible in the Application
 
@@ -140,12 +142,12 @@ If there are Shibboleth attributes that you expect to be visible in your applica
 
 ### Apache (not Tomcat) Responds to Requests with 413 Status
 
-The [413 status](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413) signals that Shibboleth (or other mechanism) on the Apache side is trying to process a request containing an entity (header, attribute, etc) that exceeds its configured capacity. Fix this by doing the following:
+The [413 status](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413) signals that Apache is trying to process a request containing an entity (header, attribute, etc) that exceeds its configured capacity. The likely cause in the case of Shibboleth is that one of the attributes contains **a lot** of data. Fix this by doing the following:
 
 1. Edit `workers.properties` adding the line `worker.[worker-name].max_packet_size=65536`. Restart Apache.
-1. Edit `elmr/conf/server.xml` adding the attribute `packetSize=65536` to the AJP `<Connector>`. Restart Tomcat.
+1. Edit `elmr/conf/server.xml` adding the attribute `packetSize="65536"` to the AJP `<Connector>`. Restart Tomcat.
 
-It is important that the values for `max_packet_size` and `packetSize` are the same. It's OK to set it this high. This isn't configured by default for any of the examples in the source. When this is done, the request will go through. 
+It is important that the values for `max_packet_size` and `packetSize` are the same. It's OK to set them this high. This isn't configured by default for any of the examples in the source. When this is done, the request will go through. 
 
 See the [`workers.properties` reference](https://tomcat.apache.org/connectors-doc/reference/workers.html) and the [AJP Connector reference](https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html#Standard_Implementations) documentation for details.
 
