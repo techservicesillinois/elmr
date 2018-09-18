@@ -40,7 +40,8 @@ public class AttributesServlet extends HttpServlet {
       String reqAttrName = reqAttrNames.next();
       reqAttrs.put(reqAttrName, req.getAttribute(reqAttrName));
     }
-    var html = HtmlSupport.renderAttributesPage(attrNames, reqAttrs);
+    var logoutUrl = getServletContext().getContextPath() + "/session?mode=logout";
+    var html = HtmlSupport.renderAttributesPage(logoutUrl, attrNames, reqAttrs);
     resp.setContentType("text/html; charset=UTF-8");
     resp.setContentLength(html.length);
     try (var os = resp.getOutputStream()) {
