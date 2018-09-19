@@ -340,21 +340,18 @@ public final class Json {
    * Objects but are 1 of Map (with keys and values as previously described), List whose values are
    * scalars, or scalars that are String, boolean, or Number types.
    * 
-   * @param json
-   * @return
+   * @param json String to convert to a Map
+   * @return Map value of json string.
    */
   @SuppressWarnings("unchecked")
   public static Map<String, Object> marshal(String json) {
     // With great thanks to
     // http://www.adam-bien.com/roller/abien/entry/converting_json_to_map_with
-    var seManager = new ScriptEngineManager();
-    var se = seManager.getEngineByName("javascript");
-    LOGGER.fine(() -> String.format("Marshalling %s", json));
-    var script = String.format("Java.asJSONCompatible(%s)", json);
+    var se = new ScriptEngineManager().getEngineByName("javascript");
+    LOGGER.finer(() -> String.format("Marshalling %s", json));
 
     try {
-      Object evaluated = se.eval(script);
-      return (Map<String, Object>) evaluated;
+      return (Map<String, Object>) se.eval(String.format("Java.asJSONCompatible(%s)", json));
     } catch (ScriptException e) {
       throw new RuntimeException(e);
     }
