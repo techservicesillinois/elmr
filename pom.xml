@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.illinois.techservices.elmr</groupId>
   <artifactId>elmr</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <properties>
     <commons-daemon.version>1.1.0</commons-daemon.version>
     <jedis.version>2.9.0</jedis.version>
