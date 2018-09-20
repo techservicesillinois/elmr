@@ -1,18 +1,23 @@
-package edu.illinois.techservices.elmr;
+package edu.illinois.techservices.elmr.servlets;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import java.io.File;
 import java.io.FileWriter;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.List;
-import javax.xml.parsers.SAXParserFactory;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import edu.illinois.techservices.elmr.AttributeMapReader;
 
-class AttributeMapHandlerTest {
+class AttributeMapContextListenerTest {
 
   private static final String TEMP_XML_FILE_NAME_PREFIX =
-      AttributeMapHandlerTest.class.getName().replaceAll("\\.", "-");
+      AttributeMapContextListenerTest.class.getName().replaceAll("\\.", "-");
 
   private static final String TEMP_XML_FILE_NAME_SUFFIX = ".xml";
 
@@ -114,34 +119,82 @@ class AttributeMapHandlerTest {
           "    <AttributeDecoder xsi:type=\"StringAttributeDecoder\" caseSensitive=\"false\"/>\n");
       fw.write("  </Attribute>\n");
       fw.write("</Attributes>\n");
-
     }
     xmlFilename = xml.getAbsolutePath();
   }
 
   @Test
-  void testReadingAttributeIds() {
-    var attributeMapHandler = new AttributeMapHandler();
-    try {
-      var parserFactory = SAXParserFactory.newInstance();
-      var parser = parserFactory.newSAXParser();
-      parser.parse(new File(xmlFilename), attributeMapHandler);
-      List<String> actual = attributeMapHandler.getAttributeNames();
-      assertTrue(actual.contains("eduPersonPrincipalName"));
-      assertTrue(actual.contains("eduPersonPrincipalName"));
-      assertTrue(actual.contains("eduPersonTargetedID"));
-      assertTrue(actual.contains("affiliation"));
-      assertTrue(actual.contains("eduPersonAffiliation"));
-      assertTrue(actual.contains("displayName"));
-      assertTrue(actual.contains("uid"));
-      assertTrue(actual.contains("mail"));
-      assertTrue(actual.contains("iTrustAffiliation"));
-      assertTrue(actual.contains("iTrustUIN"));
-      assertTrue(actual.contains("uiucEduSource"));
-      assertTrue(actual.contains("uiucEduStudentLevelCode"));
-      assertTrue(actual.contains("uiucEduStudentAdmitLevelCode"));
-    } catch (Exception e) {
-      fail(e);
-    }
+  void testContextParametersSet() {
+    var initParameters = new HashMap<String, Object>();
+    initParameters.put(AttributeMapReader.FILE_SYSPROP, xmlFilename);
+    var context = (ServletContext) Proxy.newProxyInstance(
+        AttributeMapContextListenerTest.class.getClassLoader(),
+        new Class<?>[] {ServletContext.class}, new ServletContextProxy(initParameters));
+    var sce = new ServletContextEvent(context);
+    var attributeMapContextListener = new AttributeMapContextListener();
+    attributeMapContextListener.contextInitialized(sce);
+
+    @SuppressWarnings("unchecked")
+    var attrnames =
+        (List<String>) context.getAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
+    assertFalse(attrnames.isEmpty());
+    assertTrue(attrnames.contains("eduPersonPrincipalName"));
+    assertTrue(attrnames.contains("eduPersonTargetedID"));
+    assertTrue(attrnames.contains("affiliation"));
+    assertTrue(attrnames.contains("eduPersonAffiliation"));
+    assertTrue(attrnames.contains("displayName"));
+    assertTrue(attrnames.contains("uid"));
+    assertTrue(attrnames.contains("mail"));
+    assertTrue(attrnames.contains("iTrustAffiliation"));
+    assertTrue(attrnames.contains("iTrustUIN"));
+    assertTrue(attrnames.contains("uiucEduSource"));
+    assertTrue(attrnames.contains("uiucEduStudentLevelCode"));
+    assertTrue(attrnames.contains("uiucEduStudentAdmitLevelCode"));
+  }
+
+  @Test
+  void testSystemPropertySet() {
+    var initParameters = new HashMap<String, Object>();
+    initParameters.put(AttributeMapReader.FILE_SYSPROP, xmlFilename);
+    var context = (ServletContext) Proxy.newProxyInstance(
+        AttributeMapContextListenerTest.class.getClassLoader(),
+        new Class<?>[] {ServletContext.class}, new ServletContextProxy(initParameters));
+    var attributeMapContextListener = new AttributeMapContextListener();
+    var sce = new ServletContextEvent(context);
+
+    // Set the System Property here
+    System.setProperty(AttributeMapReader.FILE_SYSPROP, xmlFilename);
+
+    attributeMapContextListener.contextInitialized(sce);
+
+    // Now unset the property so that other tests are contaminated with this value
+    System.clearProperty(AttributeMapReader.FILE_SYSPROP);
+    @SuppressWarnings("unchecked")
+    var attrnames =
+        (List<String>) context.getAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
+    assertFalse(attrnames.isEmpty());
+    assertTrue(attrnames.contains("eduPersonPrincipalName"));
+    assertTrue(attrnames.contains("eduPersonTargetedID"));
+    assertTrue(attrnames.contains("affiliation"));
+    assertTrue(attrnames.contains("eduPersonAffiliation"));
+    assertTrue(attrnames.contains("displayName"));
+    assertTrue(attrnames.contains("uid"));
+    assertTrue(attrnames.contains("mail"));
+    assertTrue(attrnames.contains("iTrustAffiliation"));
+    assertTrue(attrnames.contains("iTrustUIN"));
+    assertTrue(attrnames.contains("uiucEduSource"));
+    assertTrue(attrnames.contains("uiucEduStudentLevelCode"));
+    assertTrue(attrnames.contains("uiucEduStudentAdmitLevelCode"));
+  }
+
+  @Test
+  void testDefaultsAndNoFileThrowsRuntimeException() {
+    var context = (ServletContext) Proxy.newProxyInstance(
+        AttributeMapContextListenerTest.class.getClassLoader(),
+        new Class<?>[] {ServletContext.class},
+        new ServletContextProxy(new HashMap<String, Object>()));
+    var sce = new ServletContextEvent(context);
+    var attributeMapContextListener = new AttributeMapContextListener();
+    assertThrows(RuntimeException.class, () -> attributeMapContextListener.contextInitialized(sce));
   }
 }
