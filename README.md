@@ -36,13 +36,11 @@ Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory str
 
     elmr
     ├── bin                (control scripts)
-    ├── conf               (server wide configuration)
-    │   └── Catalina
-    │       └── localhost  (web application configuration)
+    ├── conf               (server wide and application configuration)
     ├── lib                (Tomcat server libraries)
     ├── logs
     ├── temp
-    ├── webapps            
+    ├── webapps
     │   └── elmr
     │       └── WEB-INF
     │           └── lib    (elmr web application libraries)
@@ -54,12 +52,12 @@ There are 6 configuration components:
 
 1. `bin/setenv.sh` for system properties.
 1. `conf/server.xml` for Tomcat server-wide configuration.
-1. `conf/Catalina/localhost/elmr.xml` for elmr web application configuration (do not use `web.xml`).
+1. `conf/context.xml` for elmr web application configuration (do not use `web.xml`).
 1. `conf/logging.properties` for `java.util.logging`/`org.apache.tomcat.juli` configuration.
 1. `conf/mod_jk.conf` for configuring the connection between Apache + Shibboleth and Tomcat.
 1. `conf/workers.properties` for configuring the connection between Apache and Tomcat. 
 
-It is recommended that web application configuration be set in the file `conf/Catalina/localhost/elmr.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. Logging is configured in `conf/logging.properties`.
+It is recommended that web application configuration be set in the file `conf/context.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. Logging is configured in `conf/logging.properties`.
 
 ### Configuring Tomcat in conf/server.xml
 
@@ -83,9 +81,9 @@ Property | Description
 `edu.illinois.techservices.elmr.servlets.HtmlRenderer.indentSpaces` | When set with the above property, use this value for the indent spaces. The default value is `2`.
 
 
-### Setting Context Parameters in conf/Catalina/localhost/elmr.xml
+### Setting Context Parameters in conf/context.xml
 
-Context parameters are read when the Tomcat server is started from the `conf/Catalina/localhost/elmr.xml` (there is no `webapps/elmr/WEB-INF/web.xml` file in this application). See [Tomcat Context Parameters](https://tomcat.apache.org/tomcat-9.0-doc/config/context.html#Context_Parameters) for how these work and how they replace elements in a traditional `web.xml` file. Edit the `value` attributes of the `<Parameter>` elements as follows:
+Context parameters are read when the Tomcat server is started from the `conf/context.xml` (there is no `webapps/elmr/WEB-INF/web.xml` file in this application). See [Tomcat Context Parameters](https://tomcat.apache.org/tomcat-9.0-doc/config/context.html#Context_Parameters) for how these work and how they replace elements in a traditional `web.xml` file. Edit the `value` attributes of the `<Parameter>` elements as follows:
 
 Parameter Name | Description
 ---|---
@@ -93,6 +91,8 @@ Parameter Name | Description
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a default value of `localhost`.
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a default value of `6379`.
 `edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the file will not load and elmr will not recognize that anything in Apache is configured.
+
+These parameters would affect **ALL** contexts (web applications) deployed to the `webapps` directory. Since elmr is the only context, configuring at this level is OK. If you want to override this configuration or deploy more web applications, see the link above about configuring contexts in Tomcat.
 
 ### Configuring Logging in conf/logging.properties
 

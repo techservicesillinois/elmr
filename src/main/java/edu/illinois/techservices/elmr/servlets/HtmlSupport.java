@@ -35,12 +35,13 @@ class HtmlSupport {
   /**
    * Generates and returns an Html page of user attribute values as a byte array.
    * 
+   * @param logoutUrl      Url to redirect logout requests to.
    * @param userAttributes Collection of user attribute names.
    * @param reqAttrs       request attributes mapped to the current user's request.
    * @return an Html page of user attributes as a byte array.
    * @throws IOException if an IOException occurs while the page is generated.
    */
-  static byte[] renderAttributesPage(Collection<String> userAttributes,
+  static byte[] renderAttributesPage(String logoutUrl, Collection<String> userAttributes,
       Map<String, Object> reqAttrs) throws IOException {
     try {
 
@@ -88,12 +89,16 @@ class HtmlSupport {
       p0.setTextContent("The following attributes were found for the current user:");
       p0.appendChild(table);
 
+      var p1 = page.createElement("p");
+      p1.appendChild(createLogoutLink(page, logoutUrl, "Logout"));
+
       var h1 = page.createElement("h1");
       h1.setTextContent(USER_ATTRIBUTES_TITLE);
 
       var containerDiv0 = createContainerDiv(page);
       containerDiv0.appendChild(h1);
       containerDiv0.appendChild(p0);
+      containerDiv0.appendChild(p1);
 
       var body = page.createElement("body");
       body.appendChild(containerDiv0);
@@ -112,6 +117,7 @@ class HtmlSupport {
   /**
    * Generates and returns an Html page of configuration values as a byte array.
    * 
+   * @param logoutUrl          Url to redirect logout requests to.
    * @param allAttributeNames  Collection of all configured attribute names in Apache and
    *                           Shibboleth.
    * @param jkEnvVars          Collection of attribute names exposed as JkEnvVars.
@@ -120,8 +126,8 @@ class HtmlSupport {
    * @return an Html page of configuration values as a byte array.
    * @throws IOException if an IOException occurs during page generation.
    */
-  static byte[] renderConfigPage(Collection<String> allAttributeNames, Collection<String> jkEnvVars,
-      Collection<String> userAttributeNames) throws IOException {
+  static byte[] renderConfigPage(String logoutUrl, Collection<String> allAttributeNames,
+      Collection<String> jkEnvVars, Collection<String> userAttributeNames) throws IOException {
     try {
 
       var page = createDocument();
@@ -157,12 +163,17 @@ class HtmlSupport {
       p0.setTextContent("The following attributes are exposed to this application:");
       p0.appendChild(table);
 
+      var p1 = page.createElement("p");
+      p1.appendChild(createLogoutLink(page, logoutUrl, "Logout"));
+
       var h1 = page.createElement("h1");
       h1.setTextContent(CONFIG_PAGE_TITLE);
 
       var containerDiv0 = createContainerDiv(page);
+
       containerDiv0.appendChild(h1);
       containerDiv0.appendChild(p0);
+      containerDiv0.appendChild(p1);
 
       var body = page.createElement("body");
       body.appendChild(containerDiv0);
@@ -251,6 +262,13 @@ class HtmlSupport {
     }
     setClasses(tdOrThElement, classes);
     return tdOrThElement;
+  }
+
+  private static Element createLogoutLink(Document page, String logoutUrl, String content) {
+    var a = page.createElement("a");
+    a.setAttribute("href", logoutUrl);
+    a.setTextContent(content);
+    return a;
   }
 
   private static void setClasses(Element e, String... classes) {

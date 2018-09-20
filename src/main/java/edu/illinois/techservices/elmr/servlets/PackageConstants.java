@@ -19,7 +19,12 @@ final class PackageConstants {
    * Name of the context variable with the configured Shibboleth attribute names.
    */
   static final String ATTRIBUTES_CONTEXT_PARAM_NAME =
-      AttributeMapContextListener.class.getPackageName() + ".attributes";
+      PackageConstants.class.getPackageName() + ".attributes";
+
+  /**
+   * Url to logout of Shibboleth from.
+   */
+  static final String LOGOUT_URL = PackageConstants.class.getPackageName() + ".logoutUrl";
 
   /**
    * Name of the cookie that has the Url back to the service after session data is stored.

@@ -48,7 +48,8 @@ public class ConfigServlet extends HttpServlet {
     allAttrs.addAll(userAttributes);
     allAttrs.addAll(jkEnvVars);
 
-    var html = HtmlSupport.renderConfigPage(allAttrs, apacheConfig.getJkEnvVars(), userAttributes);
+    var logoutUrl = getServletContext().getContextPath() + "/session?mode=logout";
+    var html = HtmlSupport.renderConfigPage(logoutUrl, allAttrs, apacheConfig.getJkEnvVars(), userAttributes);
     response.setContentType("text/html; charset=UTF-8");
     response.setContentLength(html.length);
     try (var os = response.getOutputStream()) {

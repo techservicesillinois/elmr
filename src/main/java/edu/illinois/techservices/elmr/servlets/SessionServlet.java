@@ -28,40 +28,18 @@ public class SessionServlet extends HttpServlet {
   protected void service(HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
 
-    var mode = "create";
-    var query = request.getQueryString();
-    if (query != null && query.contains("mode=")) {
-      String[] params = query.split("=");
-      for (int i = 0; i < params.length; i += 2) {
-        if (params[i].equals("mode")) {
-          mode = params[i + 1].toLowerCase();
-        }
-      }
-    }
+    var mode =
+        (request.getParameter("mode") == null || request.getParameter("mode").isEmpty()) ? "create"
+            : request.getParameter("mode");
 
-    if (mode.equals("destroy")) {
+    if (mode.equals("logout")) {
       destroySession(request, response);
+      redirectToLogout(response);
+      return;
     } else {
       createSession(request, response);
-    }
-
-    var location = request.getHeader("Location");
-    if (location == null) {
-      Cookie[] cookies = request.getCookies();
-      for (Cookie c : cookies) {
-        if (c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)) {
-          location = c.getValue();
-          break;
-        }
-      }
-    }
-    if (location == null) {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-          "Redirect back to service was not set. "
-              + "Set either a Location header or a cookie with the name '"
-              + PackageConstants.SERVICE_URL_COOKIE_NAME + "'.");
-    } else {
-      response.sendRedirect(location);
+      redirectToService(request, response);
+      return;
     }
   }
 
@@ -90,7 +68,28 @@ public class SessionServlet extends HttpServlet {
       Objects.requireNonNull(sd, "SessionData implementation is null!");
       var json = Json.renderObject(output);
       var key = sd.save(json);
-      response.addCookie(new Cookie(PackageConstants.SESSION_KEY_COOKIE_NAME, new String(key)));
+      var cookie = new Cookie(PackageConstants.SESSION_KEY_COOKIE_NAME, new String(key));
+      cookie.setPath("/");
+      response.addCookie(cookie);
+    }
+  }
+
+  private void redirectToService(HttpServletRequest request, HttpServletResponse response)
+      throws IOException, ServletException {
+    var location = "";
+    var cookies = request.getCookies();
+    for (Cookie c : cookies) {
+      if (c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)) {
+        location = c.getValue();
+        break;
+      }
+    }
+    if (location == null || location.isEmpty()) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+          "Redirect back to service was not set. Set a cookie with the name '"
+              + PackageConstants.SERVICE_URL_COOKIE_NAME + "'.");
+    } else {
+      response.sendRedirect(location);
     }
   }
 
@@ -99,14 +98,34 @@ public class SessionServlet extends HttpServlet {
     var sd = (SessionData) getServletContext()
         .getAttribute(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
     Objects.requireNonNull(sd, "SessionData implementation is null!");
-    Cookie[] cookies = request.getCookies();
+    var cookies = request.getCookies();
+    var sessionKeyCookieDestroyed = false;
+    var serviceUrlCookieDestroyed = false;
     for (Cookie c : cookies) {
       if (c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)) {
         byte[] key = c.getValue().getBytes();
         sd.destroy(key);
-        c.setMaxAge(0);
+        response.addCookie(createCookieToUnset(PackageConstants.SESSION_KEY_COOKIE_NAME));
+        sessionKeyCookieDestroyed = true;
+      } else if (c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)) {
+        response.addCookie(createCookieToUnset(PackageConstants.SERVICE_URL_COOKIE_NAME));
+        serviceUrlCookieDestroyed = true;
+      }
+      if (sessionKeyCookieDestroyed && serviceUrlCookieDestroyed) {
         break;
       }
     }
+  }
+
+  private Cookie createCookieToUnset(String name) {
+    Cookie toUnset = new Cookie(name, null);
+    toUnset.setMaxAge(0);
+    toUnset.setPath("/");
+    return toUnset;
+  }
+
+  private void redirectToLogout(HttpServletResponse response) throws IOException, ServletException {
+    var logoutUrl = getServletContext().getInitParameter(PackageConstants.LOGOUT_URL);
+    response.sendRedirect(logoutUrl);
   }
 }
