@@ -111,7 +111,7 @@ class ApacheConfigFileLoaderTest {
     var context =
         (ServletContext) Proxy.newProxyInstance(ApacheConfigFileLoaderTest.class.getClassLoader(),
             new Class<?>[] {ServletContext.class},
-            new ServletContextProxy(new HashMap<String, Object>()));
+            new ServletContextInvocationHandler(new HashMap<String, Object>()));
     var sce = new ServletContextEvent(context);
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
     apacheConfigFileLoader.contextInitialized(sce);
@@ -128,7 +128,8 @@ class ApacheConfigFileLoaderTest {
     initParameters.put(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
     var context =
         (ServletContext) Proxy.newProxyInstance(ApacheConfigFileLoaderTest.class.getClassLoader(),
-            new Class<?>[] {ServletContext.class}, new ServletContextProxy(initParameters));
+            new Class<?>[] {ServletContext.class},
+            new ServletContextInvocationHandler(initParameters));
     var sce = new ServletContextEvent(context);
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
     apacheConfigFileLoader.contextInitialized(sce);
@@ -162,7 +163,8 @@ class ApacheConfigFileLoaderTest {
     initParameters.put(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
     var context =
         (ServletContext) Proxy.newProxyInstance(ApacheConfigFileLoaderTest.class.getClassLoader(),
-            new Class<?>[] {ServletContext.class}, new ServletContextProxy(initParameters));
+            new Class<?>[] {ServletContext.class},
+            new ServletContextInvocationHandler(initParameters));
     var sce = new ServletContextEvent(context);
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
 

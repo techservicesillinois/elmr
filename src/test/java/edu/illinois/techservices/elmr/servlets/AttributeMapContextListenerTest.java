@@ -129,7 +129,7 @@ class AttributeMapContextListenerTest {
     initParameters.put(AttributeMapReader.FILE_SYSPROP, xmlFilename);
     var context = (ServletContext) Proxy.newProxyInstance(
         AttributeMapContextListenerTest.class.getClassLoader(),
-        new Class<?>[] {ServletContext.class}, new ServletContextProxy(initParameters));
+        new Class<?>[] {ServletContext.class}, new ServletContextInvocationHandler(initParameters));
     var sce = new ServletContextEvent(context);
     var attributeMapContextListener = new AttributeMapContextListener();
     attributeMapContextListener.contextInitialized(sce);
@@ -158,7 +158,7 @@ class AttributeMapContextListenerTest {
     initParameters.put(AttributeMapReader.FILE_SYSPROP, xmlFilename);
     var context = (ServletContext) Proxy.newProxyInstance(
         AttributeMapContextListenerTest.class.getClassLoader(),
-        new Class<?>[] {ServletContext.class}, new ServletContextProxy(initParameters));
+        new Class<?>[] {ServletContext.class}, new ServletContextInvocationHandler(initParameters));
     var attributeMapContextListener = new AttributeMapContextListener();
     var sce = new ServletContextEvent(context);
 
@@ -192,7 +192,7 @@ class AttributeMapContextListenerTest {
     var context = (ServletContext) Proxy.newProxyInstance(
         AttributeMapContextListenerTest.class.getClassLoader(),
         new Class<?>[] {ServletContext.class},
-        new ServletContextProxy(new HashMap<String, Object>()));
+        new ServletContextInvocationHandler(new HashMap<String, Object>()));
     var sce = new ServletContextEvent(context);
     var attributeMapContextListener = new AttributeMapContextListener();
     assertThrows(RuntimeException.class, () -> attributeMapContextListener.contextInitialized(sce));
