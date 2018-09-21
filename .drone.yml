@@ -1,0 +1,16 @@
+pipeline:
+  build:
+    image: maven:3-jdk-10-slim
+    commands:
+      - mvn package
+
+#  ecr:
+#    image: plugins/ecr:1.0
+#    region: us-east-2
+#    repo: 617683844790.dkr.ecr.us-east-2.amazonaws.com/box-team-folders
+#    tags:
+#      - latest
+#      - ${DRONE_COMMIT}
+#      - ${DRONE_COMMIT_SHA}
+#    when:
+#      branch: master
