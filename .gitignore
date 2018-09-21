@@ -44,10 +44,6 @@ tmp/
 sourcefiles.*
 classfiles.*
 
-# Makefiles (at least for now) #
-Makefile
-Makefile.*
-
 # Created by https://www.gitignore.io/api/eclipse
 
 ### Eclipse ###
