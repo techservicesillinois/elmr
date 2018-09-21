@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.el.MethodNotFoundException;
 
 /**
- * Proxy for ServletContext objects used in tests.
+ * Proxy for {@link javax.servlet.ServletContext} objects used in tests.
  */
 public class ServletContextProxy implements InvocationHandler {
 
@@ -16,10 +16,18 @@ public class ServletContextProxy implements InvocationHandler {
 
   private final Map<String, Object> attributes = new HashMap<>();
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param initParameters a Map of the context initialization parameters.
+   */
   public ServletContextProxy(Map<String, Object> initParameters) {
     this.initParameters = Collections.unmodifiableMap(initParameters);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     if (method.getName().equals("getInitParameter")) {
