@@ -15,7 +15,8 @@ COPY attribute-map.xml /etc/shibboleth/
 USER nobody
 EXPOSE 8009
 
-HEALTHCHECK CMD curl -s -o /dev/null -I -w "%{http_code}" http://localhost:8080/elmr/attributes | grep -q 302 || exit 1
+HEALTHCHECK CMD curl -sS -o /dev/stderr -I -w "%{http_code}" http://localhost:8080/elmr/attributes \
+    | grep -q 302 || exit 1
  
 ENTRYPOINT  [ "java", "-cp",  "/opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.jar", \
        "--add-opens=java.base/java.lang=ALL-UNNAMED", \
