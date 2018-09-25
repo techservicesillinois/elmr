@@ -3,10 +3,12 @@ FROM openjdk:10-jre-slim
 MAINTAINER Technology Services, University of Illinois Urbana
 
 ADD target/elmr-distribution.tar.gz /opt/
+RUN mkdir -p /etc/shibboleth
+COPY attribute-map.xml /etc/shibboleth/ 
 
 EXPOSE 8009
  
-CMD  [ "java", "-cp",  "/opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.jar", \
+ENTRYPOINT  [ "java", "-cp",  "/opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.jar", \
        "--add-opens=java.base/java.lang=ALL-UNNAMED", \
        "--add-opens=java.base/java.io=ALL-UNNAMED", \
        "--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED", \
