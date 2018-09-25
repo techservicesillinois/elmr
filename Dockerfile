@@ -3,9 +3,12 @@ FROM openjdk:10-jre-slim
 MAINTAINER Technology Services, University of Illinois Urbana
 
 ADD target/elmr-distribution.tar.gz /opt/
-RUN mkdir -p /etc/shibboleth
+RUN mkdir -p /etc/shibboleth \
+    && chown -R root:root /opt/elmr/ \
+    && chmod -R ugo+r /opt/elmr/  
 COPY attribute-map.xml /etc/shibboleth/ 
 
+USER nobody
 EXPOSE 8009
  
 ENTRYPOINT  [ "java", "-cp",  "/opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.jar", \
