@@ -22,15 +22,21 @@ import javax.servlet.http.Cookie;
  * {@link javax.servlet.http} package.
  * 
  * <p>
- * This implementation can invoke methods on the following interfaces:
+ * This implementation can invoke methods for the following interfaces:
  * 
  * <ul>
  * <li>{@link javax.servlet.FilterConfig}
  * <li>{@link javax.servlet.FilterChain}
+ * <li>{@link javax.servlet.ServletConfig}
  * <li>{@link javax.servlet.ServletContext}
  * <li>{@link javax.servlet.http.HttpServletRequest}
  * <li>{@link javax.servlet.http.HttpServletResponse}
  * </ul>
+ * 
+ * <p>
+ * This implementation does not 100% cover all methods in the servlet API. Rather, it is an
+ * invocation handler of just the methods invoked for the proxy objects in the tests. No interface
+ * is completely implemented by this class.
  */
 class ServletApiInvocationHandler implements InvocationHandler {
 
@@ -360,8 +366,8 @@ class ServletApiInvocationHandler implements InvocationHandler {
   }
 
   /**
-   * Returns the number of times {@link javax.servlet.http.HttpServletResponse#sendError(int, String)
-   * sendError} was called.
+   * Returns the number of times
+   * {@link javax.servlet.http.HttpServletResponse#sendError(int, String) sendError} was called.
    */
   int getSendErrorCallCount() {
     return sendErrorCallCount;
