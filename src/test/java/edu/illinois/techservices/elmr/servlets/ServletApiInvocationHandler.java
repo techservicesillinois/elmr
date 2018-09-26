@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.el.MethodNotFoundException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 
@@ -280,7 +279,7 @@ class ServletApiInvocationHandler implements InvocationHandler {
 
     } else {
 
-      throw new MethodNotFoundException("Don't know about " + method.getName());
+      throw new RuntimeException("Don't know about method " + method.getName());
 
     }
   }
