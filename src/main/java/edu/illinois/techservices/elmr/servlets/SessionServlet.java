@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
@@ -33,74 +34,86 @@ public class SessionServlet extends HttpServlet {
             : request.getParameter("mode");
 
     if (mode.equals("logout")) {
-      destroySession(request, response);
-      redirectToLogout(response);
-      return;
+      if (sessionDestroyed(request, response)) {
+        redirectToLogout(response);
+      }
     } else {
-      createSession(request, response);
-      redirectToService(request, response);
-      return;
+      var serviceUrl = getServiceUrl(request.getCookies());
+      if (serviceUrl == null || serviceUrl.isEmpty()) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+            "Redirect back to service was not set. Set a cookie with the name '"
+                + PackageConstants.SERVICE_URL_COOKIE_NAME + "'.");
+      } else if (sessionCreated(request, response)) {
+        response.sendRedirect(serviceUrl);
+      }
     }
+    return;
   }
 
-  private void createSession(HttpServletRequest request, HttpServletResponse response)
+  private boolean sessionCreated(HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
+
+    var sd = (SessionData) getServletContext()
+        .getAttribute(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
+    if (sd == null) {
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "Session data store not configured!");
+      return false;
+    }
 
     @SuppressWarnings("unchecked")
     List<String> userAttributes = (List<String>) getServletContext()
         .getAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
 
-    // Generate a Map with attribute names as keys and Shibboleth attribute values as values.
-    Map<String, Object> output =
-        userAttributes.stream().filter(userAttr -> Objects.nonNull(request.getAttribute(userAttr)))
-            .collect(Collectors.toMap(Function.identity(), userAttr -> {
-              String attr = (String) request.getAttribute(userAttr);
-              if (attr.indexOf(';') > 0) {
-                return Arrays.asList(attr.split(";"));
-              }
-              return attr;
-            }));
-    if (output.size() <= 0) {
+    Map<String, Object> output = Map.of();
+    if (userAttributes != null && !userAttributes.isEmpty()) {
+      // Generate a Map with attribute names as keys and Shibboleth attribute values as values.
+      output = userAttributes.stream()
+          .filter(userAttr -> Objects.nonNull(request.getAttribute(userAttr)))
+          .collect(Collectors.toMap(Function.identity(), userAttr -> {
+            String attr = (String) request.getAttribute(userAttr);
+            if (attr.indexOf(';') > 0) {
+              return Arrays.asList(attr.split(";"));
+            }
+            return attr;
+          }));
+    }
+    if (output.isEmpty()) {
       response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+      return false;
     } else {
-      var sd = (SessionData) getServletContext()
-          .getAttribute(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
-      Objects.requireNonNull(sd, "SessionData implementation is null!");
       var json = Json.renderObject(output);
       var key = sd.save(json);
       var cookie = new Cookie(PackageConstants.SESSION_KEY_COOKIE_NAME, new String(key));
       cookie.setPath("/");
       response.addCookie(cookie);
+      return true;
     }
   }
 
-  private void redirectToService(HttpServletRequest request, HttpServletResponse response)
-      throws IOException, ServletException {
-    var location = "";
-    var cookies = request.getCookies();
-    for (Cookie c : cookies) {
-      if (c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)) {
-        location = c.getValue();
-        break;
-      }
-    }
-    if (location == null || location.isEmpty()) {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-          "Redirect back to service was not set. Set a cookie with the name '"
-              + PackageConstants.SERVICE_URL_COOKIE_NAME + "'.");
-    } else {
-      response.sendRedirect(location);
-    }
+  private String getServiceUrl(Cookie[] cookies) {
+    Optional<Cookie> maybeHaveServiceUrlCookie = Arrays.stream(cookies)
+        .filter(c -> c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)).findAny();
+    return maybeHaveServiceUrlCookie.isPresent() ? maybeHaveServiceUrlCookie.get().getValue() : "";
   }
 
-  private void destroySession(HttpServletRequest request, HttpServletResponse response)
+  private boolean sessionDestroyed(HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
+
     var sd = (SessionData) getServletContext()
         .getAttribute(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
-    Objects.requireNonNull(sd, "SessionData implementation is null!");
+    if (sd == null) {
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "Session data store not configured!");
+      return false;
+    }
+
     var cookies = request.getCookies();
     var sessionKeyCookieDestroyed = false;
     var serviceUrlCookieDestroyed = false;
+    
+    // These cookies may or may not be set at this point. This loop makes sure that if the Cookies
+    // are still there that they are destroyed.
     for (Cookie c : cookies) {
       if (c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)) {
         byte[] key = c.getValue().getBytes();
@@ -115,6 +128,8 @@ public class SessionServlet extends HttpServlet {
         break;
       }
     }
+    // If we get this far, logout has happened.
+    return true;
   }
 
   private Cookie createCookieToUnset(String name) {
@@ -126,6 +141,11 @@ public class SessionServlet extends HttpServlet {
 
   private void redirectToLogout(HttpServletResponse response) throws IOException, ServletException {
     var logoutUrl = getServletContext().getInitParameter(PackageConstants.LOGOUT_URL);
-    response.sendRedirect(logoutUrl);
+    if (logoutUrl == null || logoutUrl.isEmpty()) {
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "Redirect URL for logout not set!");
+    } else {
+      response.sendRedirect(logoutUrl);
+    }
   }
 }

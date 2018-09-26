@@ -1,6 +1,7 @@
 package edu.illinois.techservices.elmr.servlets;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Logger;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -41,7 +42,8 @@ public class AttributesFilter extends HttpFilter {
 
     if (!sessionKeyCookieFound) {
       LOGGER.fine("Did not find a session key, redirecting to create a session.");
-      var serviceUrlCookie = new Cookie(PackageConstants.SERVICE_URL_COOKIE_NAME, req.getRequestURI());
+      var serviceUrlCookie =
+          new Cookie(PackageConstants.SERVICE_URL_COOKIE_NAME, req.getRequestURI());
       serviceUrlCookie.setPath("/");
       res.addCookie(serviceUrlCookie);
       res.sendRedirect(getServletContext().getContextPath() + "/session");
@@ -52,6 +54,10 @@ public class AttributesFilter extends HttpFilter {
       LOGGER.fine("Found session key " + encodedKey);
       var sd = (SessionData) getServletContext()
           .getAttribute(SessionDataContextListener.class.getPackageName() + ".sessionData");
+      Objects.requireNonNull(sd, () -> {
+        LOGGER.warning("Session data object not set!");
+        return "Session data object not set!";
+      });
       var sessionDataJson = sd.get(encodedKey.getBytes());
       var sessionData = Json.marshal(sessionDataJson);
       if (sessionData != null) {

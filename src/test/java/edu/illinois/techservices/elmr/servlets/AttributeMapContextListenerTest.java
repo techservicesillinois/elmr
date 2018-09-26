@@ -125,11 +125,12 @@ class AttributeMapContextListenerTest {
 
   @Test
   void testContextParametersSet() {
-    var initParameters = new HashMap<String, Object>();
+    var initParameters = new HashMap<String, String>();
     initParameters.put(AttributeMapReader.FILE_SYSPROP, xmlFilename);
     var context = (ServletContext) Proxy.newProxyInstance(
         AttributeMapContextListenerTest.class.getClassLoader(),
-        new Class<?>[] {ServletContext.class}, new ServletContextInvocationHandler(initParameters));
+        new Class<?>[] {ServletContext.class},
+        new ServletApiInvocationHandler.Builder().addInitParameters(initParameters).build());
     var sce = new ServletContextEvent(context);
     var attributeMapContextListener = new AttributeMapContextListener();
     attributeMapContextListener.contextInitialized(sce);
@@ -154,11 +155,12 @@ class AttributeMapContextListenerTest {
 
   @Test
   void testSystemPropertySet() {
-    var initParameters = new HashMap<String, Object>();
+    var initParameters = new HashMap<String, String>();
     initParameters.put(AttributeMapReader.FILE_SYSPROP, xmlFilename);
     var context = (ServletContext) Proxy.newProxyInstance(
         AttributeMapContextListenerTest.class.getClassLoader(),
-        new Class<?>[] {ServletContext.class}, new ServletContextInvocationHandler(initParameters));
+        new Class<?>[] {ServletContext.class},
+        new ServletApiInvocationHandler.Builder().addInitParameters(initParameters).build());
     var attributeMapContextListener = new AttributeMapContextListener();
     var sce = new ServletContextEvent(context);
 
@@ -191,8 +193,7 @@ class AttributeMapContextListenerTest {
   void testDefaultsAndNoFileThrowsRuntimeException() {
     var context = (ServletContext) Proxy.newProxyInstance(
         AttributeMapContextListenerTest.class.getClassLoader(),
-        new Class<?>[] {ServletContext.class},
-        new ServletContextInvocationHandler(new HashMap<String, Object>()));
+        new Class<?>[] {ServletContext.class}, new ServletApiInvocationHandler.Builder().build());
     var sce = new ServletContextEvent(context);
     var attributeMapContextListener = new AttributeMapContextListener();
     assertThrows(RuntimeException.class, () -> attributeMapContextListener.contextInitialized(sce));

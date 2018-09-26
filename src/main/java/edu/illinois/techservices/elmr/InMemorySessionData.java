@@ -31,4 +31,8 @@ public final class InMemorySessionData implements SessionData {
   public void destroy(byte[] key) {
     data.remove(cacheKey.decode(key));
   }
+
+  public void clear() {
+    data.clear();
+  }
 }

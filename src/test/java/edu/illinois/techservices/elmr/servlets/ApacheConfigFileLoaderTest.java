@@ -4,10 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.FileWriter;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -109,9 +106,7 @@ class ApacheConfigFileLoaderTest {
   @Test
   void testNoParametersSet() {
     var context =
-        (ServletContext) Proxy.newProxyInstance(ApacheConfigFileLoaderTest.class.getClassLoader(),
-            new Class<?>[] {ServletContext.class},
-            new ServletContextInvocationHandler(new HashMap<String, Object>()));
+        ProxyFactories.createServletContextProxy(new ServletApiInvocationHandler.Builder().build());
     var sce = new ServletContextEvent(context);
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
     apacheConfigFileLoader.contextInitialized(sce);
@@ -124,12 +119,10 @@ class ApacheConfigFileLoaderTest {
 
   @Test
   void testContextParametersSet() {
-    var initParameters = new HashMap<String, Object>();
+    var initParameters = new HashMap<String, String>();
     initParameters.put(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
-    var context =
-        (ServletContext) Proxy.newProxyInstance(ApacheConfigFileLoaderTest.class.getClassLoader(),
-            new Class<?>[] {ServletContext.class},
-            new ServletContextInvocationHandler(initParameters));
+    var context = ProxyFactories.createServletContextProxy(
+        new ServletApiInvocationHandler.Builder().addInitParameters(initParameters).build());
     var sce = new ServletContextEvent(context);
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
     apacheConfigFileLoader.contextInitialized(sce);
@@ -159,12 +152,10 @@ class ApacheConfigFileLoaderTest {
 
   @Test
   void testSystemPropertySet() {
-    var initParameters = new HashMap<String, Object>();
+    var initParameters = new HashMap<String, String>();
     initParameters.put(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
-    var context =
-        (ServletContext) Proxy.newProxyInstance(ApacheConfigFileLoaderTest.class.getClassLoader(),
-            new Class<?>[] {ServletContext.class},
-            new ServletContextInvocationHandler(initParameters));
+    var context = ProxyFactories.createServletContextProxy(
+        new ServletApiInvocationHandler.Builder().addInitParameters(initParameters).build());
     var sce = new ServletContextEvent(context);
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
 

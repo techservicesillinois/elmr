@@ -30,6 +30,24 @@ Property | Description
 ---|---
 `edu.illinois.techservices.elmr.redis.CanConnect` | Used by `edu.illinois.techservices.elmr.SessionDataImplTests` to flag a connection to a locally running Redis instance can be connected to. Set to `true` to use the local redis instance or leave unset to not run the test.
 
+### Test Output
+
+When running tests, you will see the following output:
+
+```
+[INFO] Running edu.illinois.techservices.elmr.servlets.AttributeMapContextListenerTest
+Sep 26, 2018 1:53:11 PM edu.illinois.techservices.elmr.servlets.AttributeMapContextListener contextInitialized
+SEVERE: Problem reading /etc/shibboleth/attribute-map.xml! Cannot start application!
+java.io.FileNotFoundException: /etc/shibboleth/attribute-map.xml (No such file or directory)
+        at java.base/java.io.FileInputStream.open0(Native Method)
+        at java.base/java.io.FileInputStream.open(FileInputStream.java:220)
+        at java.base/java.io.FileInputStream.<init>(FileInputStream.java:158)
+        at edu.illinois.techservices.elmr.servlets.AttributeMapContextListener.contextInitialized(AttributeMapContextListener.java:63)
+        ...
+```
+
+This one is normal and is part of a test. If there are reported test failures with stack traces other than this one, investigate them.
+
 ## Installing
 
 Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory structure will be a traditional Tomcat server tree:
