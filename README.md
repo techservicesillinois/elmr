@@ -109,6 +109,7 @@ Parameter Name | Description
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a default value of `localhost`.
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a default value of `6379`.
 `edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the file will not load and elmr will not recognize that anything in Apache is configured.
+`edu.illinois.techservices.elmr.servlets.LogoutUrl` | URL to your web ISO's logout. Can be an absolute or relative URL. If this isn't set, logout will respond with a `500` status.
 
 These parameters would affect **ALL** contexts (web applications) deployed to the `webapps` directory. Since elmr is the only context, configuring at this level is OK. If you want to override this configuration or deploy more web applications, see the link above about configuring contexts in Tomcat.
 
