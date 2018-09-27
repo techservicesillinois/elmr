@@ -38,7 +38,7 @@ public class SessionServlet extends HttpServlet {
         redirectToLogout(response);
       }
     } else {
-      var serviceUrl = getServiceUrl(request.getCookies());
+      var serviceUrl = request.getCookies() != null ? getServiceUrl(request.getCookies()) : "";
       if (serviceUrl == null || serviceUrl.isEmpty()) {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST,
             "Redirect back to service was not set. Set a cookie with the name '"
@@ -111,7 +111,7 @@ public class SessionServlet extends HttpServlet {
     var cookies = request.getCookies();
     var sessionKeyCookieDestroyed = false;
     var serviceUrlCookieDestroyed = false;
-    
+
     // These cookies may or may not be set at this point. This loop makes sure that if the Cookies
     // are still there that they are destroyed.
     for (Cookie c : cookies) {

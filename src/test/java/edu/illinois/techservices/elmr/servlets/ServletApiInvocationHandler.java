@@ -209,8 +209,12 @@ class ServletApiInvocationHandler implements InvocationHandler {
 
     } else if (method.getName().equals("getCookies")) {
 
-      Cookie[] cookiesArray = new Cookie[cookies.size()];
-      return cookies.toArray(cookiesArray);
+      if (cookies.isEmpty()) {
+        return null;
+      } else {
+        Cookie[] cookiesArray = new Cookie[cookies.size()];
+        return cookies.toArray(cookiesArray);
+      }
 
     } else if (method.getName().equals("getFilterName")) {
 

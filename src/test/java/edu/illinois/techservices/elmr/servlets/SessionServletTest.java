@@ -198,7 +198,6 @@ class SessionServletTest {
         "HttpServletResponse.sendRedirect(String) was not called!");
   }
 
-
   @Test
   void testServiceUrlCookieNotSetForRedirectOnCreate() {
     var servletContextInvocationHandler = new ServletApiInvocationHandler.Builder()
