@@ -36,12 +36,12 @@ class HtmlRenderer {
    * Html5 tags that have both an open and close tag.
    */
   private static final Set<String> CLOSED_TAGS = Set.of("html", "head", "body", "script", "div",
-      "title", "section", "h1", "table", "th", "tr", "td", "caption");
+      "title", "section", "h1", "table", "th", "tr", "td", "caption", "thead", "tbody", "a");
 
   /**
    * Html5 tags that are inline, meaning the contents will appear on the same line as the tags.
    */
-  private static final Set<String> INLINE_TAGS = Set.of("title", "h1", "th", "td", "caption");
+  private static final Set<String> INLINE_TAGS = Set.of("title", "h1", "th", "td", "caption", "a");
 
   /**
    * Html5 tags that are block tags, but open.
