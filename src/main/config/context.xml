@@ -20,7 +20,8 @@
   <!-- <Parameter name="edu.illinois.techservices.elmr.AttributeMapReader.file" value=""/> -->
 
   <!-- TODO: Note these values should come from AWS SSM -->
-  <Parameter name="edu.illinois.techservices.elmr.SessionData.hostname" value="redis" />
+  <!-- <Parameter name="edu.illinois.techservices.elmr.SessionData.hostname" value="redis" /> -->
+  <Parameter name="edu.illinois.techservices.elmr.SessionData.hostname" value="multi-service-test.ziiw0i.0001.use2.cache.amazonaws.com" />
   <Parameter name="edu.illinois.techservices.elmr.SessionData.port" value="6379" />
   <Parameter name="edu.illinois.techservices.elmr.servlets.ApacheConfig" value="elmr/conf/mod_jk.conf" />
   <Parameter name="edu.illinois.techservices.elmr.servlets.logoutUrl" value="/Shibboleth.sso/Logout" />
