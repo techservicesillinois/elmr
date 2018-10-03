@@ -1,4 +1,4 @@
-.PHONY: all base login push pull clean
+.PHONY: all image login push pull clean
 
 # http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
@@ -9,10 +9,10 @@ JSRC := $(call rwildcard,src,*)
 SRCS := Dockerfile $(JAR)
 IMAGE:= techservicesillinois/elmr
 
-all: base .drone.yml.sig
+all: image .drone.yml.sig
 
-base: .base
-.base: $(SRCS)
+image: .image
+.image: $(SRCS)
 	docker build -f Dockerfile -t $(IMAGE) .
 	@touch $@
 
@@ -23,7 +23,7 @@ login:
 	docker login
 
 push: .push
-.push: base
+.push: image
 	docker push $(IMAGE)
 	@touch $@
 
@@ -36,5 +36,5 @@ pull:
 
 clean:
 	-docker rmi $(IMAGE)
-	-rm -f .base 
+	-rm -f .image
 	-mvn clean
