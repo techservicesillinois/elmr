@@ -1,6 +1,7 @@
 # Created by https://www.gitignore.io/api/java
 
-.base
+.image
+.push
 
 ### Java ###
 # Compiled class file
