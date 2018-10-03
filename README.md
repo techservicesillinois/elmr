@@ -66,8 +66,9 @@ Unpack the file `elmr-distribution.tar.gz` on your filesystem. The directory str
 
 ## Configuring
 
-There are 6 configuration components:
+There are 7 configuration components:
 
+1. The command line for system properties.
 1. `bin/setenv.sh` for system properties.
 1. `conf/server.xml` for Tomcat server-wide configuration.
 1. `conf/context.xml` for elmr web application configuration (do not use `web.xml`).
@@ -75,7 +76,7 @@ There are 6 configuration components:
 1. `conf/mod_jk.conf` for configuring the connection between Apache + Shibboleth and Tomcat.
 1. `conf/workers.properties` for configuring the connection between Apache and Tomcat. 
 
-It is recommended that web application configuration be set in the file `conf/context.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. Logging is configured in `conf/logging.properties`.
+It is recommended that web application configuration be set in the file `conf/context.xml`. However for ad-hoc runs it is fine to use the system properties set in `bin/setenv.sh` to override the values in the configuration file. System properties may also be set from the command line and this is a recommendation if running this service in a Docker container. System properties override all other settings named in other configuration files. Logging is configured in `conf/logging.properties`.
 
 ### Configuring Tomcat in conf/server.xml
 
@@ -85,7 +86,7 @@ See [Apache Tomcat 9 Configuration Reference, The Server Component](https://tomc
 
 If you are using a custom installation of Java-10 in a non-default location, set the `JAVA_HOME` environment variable in `bin/setenv.sh` to point to the base directory of your JDK or JRE install. See [RUNNING.TXT](https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt) for other environment variables you can set.
 
-### Setting System Properties in bin/setenv.sh
+### Setting System Properties in bin/setenv.sh or the Command Line
 
 System properties may be set at startup and will override any other configuration that is set as described in the [subsequent subsections](#setting-context-parameters-in-confcatalinalocalhostelmrxml). They must be set in `bin/setenv.sh` by the `CATALINA_OPTS` environment variable. The table below lists what properties the application can accept outside the regular JVM system properties. See [RUNNING.TXT](https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt) for other environment variables you can set.
 
@@ -94,6 +95,7 @@ Property | Description
 `edu.illinois.techservices.elmr.AttributeMapReader.file`| Fully qualified path to a Shibboleth `attribute-map.xml` file. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
+`edu.illinois.techservices.elmr.servlets.logoutUrl` | URL to your web ISO's logout. Can be an absolute or relative URL. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.servlets.HtmlRenderer.formattedHtml` | When set to `true`, format output HTML in an indented readable format. This should only be set for development and debugging purposes.
 `edu.illinois.techservices.elmr.servlets.HtmlRenderer.indentSpaces` | When set with the above property, use this value for the indent spaces. The default value is `2`.
@@ -109,7 +111,7 @@ Parameter Name | Description
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a default value of `localhost`.
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a default value of `6379`.
 `edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the file will not load and elmr will not recognize that anything in Apache is configured.
-`edu.illinois.techservices.elmr.servlets.LogoutUrl` | URL to your web ISO's logout. Can be an absolute or relative URL. If this isn't set, logout will respond with a `500` status.
+`edu.illinois.techservices.elmr.servlets.logoutUrl` | URL to your web ISO's logout. Can be an absolute or relative URL. If this isn't set, logout will respond with a `500` status.
 
 These parameters would affect **ALL** contexts (web applications) deployed to the `webapps` directory. Since elmr is the only context, configuring at this level is OK. If you want to override this configuration or deploy more web applications, see the link above about configuring contexts in Tomcat.
 

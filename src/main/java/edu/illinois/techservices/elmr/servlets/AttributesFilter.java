@@ -32,7 +32,7 @@ public class AttributesFilter extends HttpFilter {
     if (cookies != null) {
       for (int i = 0; i < cookies.length; i++) {
         Cookie c = cookies[i];
-        if (c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)) {
+        if (c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)) {
           sessionKeyCookieFound = true;
           encodedKey = c.getValue();
           break;
@@ -43,7 +43,7 @@ public class AttributesFilter extends HttpFilter {
     if (!sessionKeyCookieFound) {
       LOGGER.fine("Did not find a session key, redirecting to create a session.");
       var serviceUrlCookie =
-          new Cookie(PackageConstants.SERVICE_URL_COOKIE_NAME, req.getRequestURI());
+          new Cookie(ServletConstants.SERVICE_URL_COOKIE_NAME, req.getRequestURI());
       serviceUrlCookie.setPath("/");
       res.addCookie(serviceUrlCookie);
       res.sendRedirect(getServletContext().getContextPath() + "/session");

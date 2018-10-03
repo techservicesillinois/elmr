@@ -137,7 +137,7 @@ class AttributeMapContextListenerTest {
 
     @SuppressWarnings("unchecked")
     var attrnames =
-        (List<String>) context.getAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
+        (List<String>) context.getAttribute(ServletConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
     assertFalse(attrnames.isEmpty());
     assertTrue(attrnames.contains("eduPersonPrincipalName"));
     assertTrue(attrnames.contains("eduPersonTargetedID"));
@@ -173,7 +173,7 @@ class AttributeMapContextListenerTest {
     System.clearProperty(AttributeMapReader.FILE_SYSPROP);
     @SuppressWarnings("unchecked")
     var attrnames =
-        (List<String>) context.getAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
+        (List<String>) context.getAttribute(ServletConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
     assertFalse(attrnames.isEmpty());
     assertTrue(attrnames.contains("eduPersonPrincipalName"));
     assertTrue(attrnames.contains("eduPersonTargetedID"));

@@ -64,12 +64,12 @@ class AttributesFilterTest {
     // Asserts here.
     var cookies = responseInvocationHandler.getResponseCookiesView();
     Optional<Cookie> maybeHaveServiceUrlCookie = cookies.stream()
-        .filter(c -> c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)).findAny();
+        .filter(c -> c.getName().equals(ServletConstants.SERVICE_URL_COOKIE_NAME)).findAny();
     assertTrue(maybeHaveServiceUrlCookie.isPresent());
     assertTrue(maybeHaveServiceUrlCookie.get().getValue().equals(REQUEST_URI));
 
     Optional<Cookie> maybeHaveSessionKeyCookie = cookies.stream()
-        .filter(c -> c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)).findAny();
+        .filter(c -> c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)).findAny();
     assertFalse(maybeHaveSessionKeyCookie.isPresent());
 
     assertTrue(responseInvocationHandler.getRedirect().equals(REDIRECT_URI));
@@ -82,7 +82,7 @@ class AttributesFilterTest {
     var sd = new InMemorySessionData();
     var key = sd.save(TEST_DATA);
     var contextAttributes = new HashMap<String, Object>();
-    contextAttributes.put(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME, sd);
+    contextAttributes.put(ServletConstants.SESSION_DATA_CONTEXT_PARAM_NAME, sd);
     var servletContextInvocationHandler =
         new ServletApiInvocationHandler.Builder().addAttributes(contextAttributes).build();
     var servletContext = ProxyFactories.createServletContextProxy(servletContextInvocationHandler);
@@ -92,7 +92,7 @@ class AttributesFilterTest {
 
     // Set up the request.
     var requestInvocationHandler = new ServletApiInvocationHandler.Builder().requestUri(REQUEST_URI)
-        .cookies(List.of(new Cookie(PackageConstants.SESSION_KEY_COOKIE_NAME, new String(key))))
+        .cookies(List.of(new Cookie(ServletConstants.SESSION_KEY_COOKIE_NAME, new String(key))))
         .build();
     var request = ProxyFactories.createHttpServletRequestProxy(requestInvocationHandler);
     var responseInvocationHandler = new ServletApiInvocationHandler.Builder().build();
@@ -116,7 +116,7 @@ class AttributesFilterTest {
     // Asserts here.
     var cookies = responseInvocationHandler.getResponseCookiesView();
     Optional<Cookie> maybeHaveServiceUrlCookie = cookies.stream()
-        .filter(c -> c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)).findAny();
+        .filter(c -> c.getName().equals(ServletConstants.SERVICE_URL_COOKIE_NAME)).findAny();
     assertFalse(maybeHaveServiceUrlCookie.isPresent());
 
     var attributes = requestInvocationHandler.getAttributes();
@@ -140,7 +140,7 @@ class AttributesFilterTest {
 
     // Set up the request.
     var requestInvocationHandler = new ServletApiInvocationHandler.Builder().requestUri(REQUEST_URI)
-        .cookies(List.of(new Cookie(PackageConstants.SESSION_KEY_COOKIE_NAME, "not used"))).build();
+        .cookies(List.of(new Cookie(ServletConstants.SESSION_KEY_COOKIE_NAME, "not used"))).build();
     var request = ProxyFactories.createHttpServletRequestProxy(requestInvocationHandler);
     var responseInvocationHandler = new ServletApiInvocationHandler.Builder().build();
     var response = ProxyFactories.createHttpServletResponseProxy(responseInvocationHandler);

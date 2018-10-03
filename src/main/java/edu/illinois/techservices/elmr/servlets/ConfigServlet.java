@@ -31,7 +31,7 @@ public class ConfigServlet extends HttpServlet {
       throws IOException, ServletException {
 
     var apacheConfig = (ApacheConfig) getServletContext()
-        .getAttribute(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+        .getAttribute(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
 
     if (apacheConfig == null) {
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -41,7 +41,7 @@ public class ConfigServlet extends HttpServlet {
 
     @SuppressWarnings("unchecked")
     List<String> userAttributes = (List<String>) getServletContext()
-        .getAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
+        .getAttribute(ServletConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
     var jkEnvVars = apacheConfig.getJkEnvVars();
 
     var allAttrs = new TreeSet<String>();

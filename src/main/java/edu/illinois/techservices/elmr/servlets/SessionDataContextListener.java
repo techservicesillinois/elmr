@@ -80,8 +80,8 @@ public class SessionDataContextListener implements ServletContextListener {
 
     SessionData sd = (hostname == null || hostname.isEmpty()) ? new SessionDataImpl()
         : new SessionDataImpl(hostname, port, new InMemorySessionData());
-    sce.getServletContext().setAttribute(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME, sd);
+    sce.getServletContext().setAttribute(ServletConstants.SESSION_DATA_CONTEXT_PARAM_NAME, sd);
     LOGGER.config("SessionData object configured; access with context property "
-        + PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
+        + ServletConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
   }
 }

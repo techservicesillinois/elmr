@@ -111,7 +111,7 @@ class ApacheConfigFileLoaderTest {
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
     apacheConfigFileLoader.contextInitialized(sce);
     var acf = (ApacheConfig) sce.getServletContext()
-        .getAttribute(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+        .getAttribute(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
 
     // Asserts are here.
     assertTrue(acf.getJkEnvVars().isEmpty());
@@ -120,14 +120,14 @@ class ApacheConfigFileLoaderTest {
   @Test
   void testContextParametersSet() {
     var initParameters = new HashMap<String, String>();
-    initParameters.put(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
+    initParameters.put(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
     var context = ProxyFactories.createServletContextProxy(
         new ServletApiInvocationHandler.Builder().addInitParameters(initParameters).build());
     var sce = new ServletContextEvent(context);
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
     apacheConfigFileLoader.contextInitialized(sce);
     var acf = (ApacheConfig) sce.getServletContext()
-        .getAttribute(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+        .getAttribute(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
 
     // Asserts are here.
     assertFalse(acf.getJkEnvVars().isEmpty());
@@ -153,21 +153,21 @@ class ApacheConfigFileLoaderTest {
   @Test
   void testSystemPropertySet() {
     var initParameters = new HashMap<String, String>();
-    initParameters.put(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
+    initParameters.put(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
     var context = ProxyFactories.createServletContextProxy(
         new ServletApiInvocationHandler.Builder().addInitParameters(initParameters).build());
     var sce = new ServletContextEvent(context);
     var apacheConfigFileLoader = new ApacheConfigFileLoader();
 
     // Set the System Property here
-    System.setProperty(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
+    System.setProperty(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, confFilename);
 
     apacheConfigFileLoader.contextInitialized(sce);
     var acf = (ApacheConfig) sce.getServletContext()
-        .getAttribute(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+        .getAttribute(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
 
     // Now unset the property so that other tests are contaminated with this value
-    System.clearProperty(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+    System.clearProperty(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
 
     // Asserts are here.
     assertFalse(acf.getJkEnvVars().isEmpty());

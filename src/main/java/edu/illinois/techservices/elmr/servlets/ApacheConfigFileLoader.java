@@ -34,21 +34,21 @@ public class ApacheConfigFileLoader implements ServletContextListener {
     LOGGER.config("Initializing data from Apache config file...");
 
     var apacheConfigFilename =
-        System.getProperty(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+        System.getProperty(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
     if (apacheConfigFilename == null || apacheConfigFilename.isEmpty()) {
       apacheConfigFilename = sce.getServletContext()
-          .getInitParameter(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+          .getInitParameter(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
       if (apacheConfigFilename == null || apacheConfigFilename.isEmpty()) {
-        LOGGER.warning(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME
+        LOGGER.warning(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME
             + " was not set as a system property or context parameter. File will not be loaded.");
 
       } else {
         LOGGER.config("Reading file set by context parameter "
-            + PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+            + ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
       }
     } else {
       LOGGER.config("Reading file set by system property "
-          + PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+          + ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
     }
 
     ApacheConfig acf = null;
@@ -61,9 +61,9 @@ public class ApacheConfigFileLoader implements ServletContextListener {
       acf = new ApacheConfig(new ByteArrayInputStream(new byte[0]));
     }
 
-    sce.getServletContext().setAttribute(PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME,
+    sce.getServletContext().setAttribute(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME,
         acf);
     LOGGER.config("Apache configuration cached; access with context property "
-        + PackageConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
+        + ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
   }
 }

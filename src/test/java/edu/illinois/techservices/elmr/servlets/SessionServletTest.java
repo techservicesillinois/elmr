@@ -43,11 +43,11 @@ class SessionServletTest {
       "uid", "eduPersonPrincipalName", "eduPersonTargetedID", "eduPersonAffiliation");
 
   private static final Map<String, Object> SERVLET_CONTEXT_ATTRIBUTES =
-      Map.of(PackageConstants.SESSION_DATA_CONTEXT_PARAM_NAME, sessionData,
-          PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME, SHIBBOLETH_ATTRIBUTE_NAMES_IN_MAP);
+      Map.of(ServletConstants.SESSION_DATA_CONTEXT_PARAM_NAME, sessionData,
+          ServletConstants.ATTRIBUTES_CONTEXT_PARAM_NAME, SHIBBOLETH_ATTRIBUTE_NAMES_IN_MAP);
 
   private static final Map<String, String> SERVLET_CONTEXT_INIT_PARAMETERS =
-      Map.of(PackageConstants.LOGOUT_URL, LOGOUT_URL);
+      Map.of(ServletConstants.LOGOUT_URL, LOGOUT_URL);
 
   private static final Map<String, Object> SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE =
       Map.of("displayName", "Test User", "uid", "testuser1", "eduPersonPrincipalName",
@@ -71,7 +71,7 @@ class SessionServletTest {
 
     var requestInvocationHandler = new ServletApiInvocationHandler.Builder()
         .addAttributes(SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE).requestUri(REQUEST_URI)
-        .cookies(List.of(new Cookie(PackageConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
+        .cookies(List.of(new Cookie(ServletConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
         .servletContext(servletContext).build();
     var httpServletRequest = ProxyFactories.createHttpServletRequestProxy(requestInvocationHandler);
 
@@ -103,11 +103,11 @@ class SessionServletTest {
     // assert session key cookie is set
     Optional<Cookie> maybeHaveSessionKeyCookie =
         responseInvocationHandler.getResponseCookiesView().stream()
-            .filter(c -> c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)).findAny();
+            .filter(c -> c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)).findAny();
     assertTrue(maybeHaveSessionKeyCookie.isPresent(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie not set!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie not set!");
     assertNotNull(maybeHaveSessionKeyCookie.get().getValue(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie value not set!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie value not set!");
 
     String json = sessionData.get(maybeHaveSessionKeyCookie.get().getValue().getBytes());
     for (String key : SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE.keySet()) {
@@ -141,7 +141,7 @@ class SessionServletTest {
     var requestInvocationHandler = new ServletApiInvocationHandler.Builder()
         .addAttributes(SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE)
         .addRequestParameters(CREATE_REQUEST_PARAMETERS).requestUri(REQUEST_URI)
-        .cookies(List.of(new Cookie(PackageConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
+        .cookies(List.of(new Cookie(ServletConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
         .servletContext(servletContext).build();
     var httpServletRequest = ProxyFactories.createHttpServletRequestProxy(requestInvocationHandler);
 
@@ -173,11 +173,11 @@ class SessionServletTest {
     // assert session key cookie is set
     Optional<Cookie> maybeHaveSessionKeyCookie =
         responseInvocationHandler.getResponseCookiesView().stream()
-            .filter(c -> c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)).findAny();
+            .filter(c -> c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)).findAny();
     assertTrue(maybeHaveSessionKeyCookie.isPresent(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie not set!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie not set!");
     assertNotNull(maybeHaveSessionKeyCookie.get().getValue(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie value not set!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie value not set!");
 
     String json = sessionData.get(maybeHaveSessionKeyCookie.get().getValue().getBytes());
     for (String key : SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE.keySet()) {
@@ -243,9 +243,9 @@ class SessionServletTest {
     // assert session key cookie is not set
     Optional<Cookie> maybeHaveSessionKeyCookie =
         responseInvocationHandler.getResponseCookiesView().stream()
-            .filter(c -> c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)).findAny();
+            .filter(c -> c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)).findAny();
     assertFalse(maybeHaveSessionKeyCookie.isPresent(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie value set!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie value set!");
     assertFalse(responseInvocationHandler.sendRedirectWasCalled(),
         "HttpServletResponse.sendRedirect(String) was called!");
   }
@@ -253,7 +253,7 @@ class SessionServletTest {
   @Test
   void testInternalErrorStatusOnCreateSessionWhenNoSessionDataObjectPresent() {
     var servletContextInvocationHandler = new ServletApiInvocationHandler.Builder().addAttributes(
-        Map.of(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME, SHIBBOLETH_ATTRIBUTE_NAMES_IN_MAP))
+        Map.of(ServletConstants.ATTRIBUTES_CONTEXT_PARAM_NAME, SHIBBOLETH_ATTRIBUTE_NAMES_IN_MAP))
         .contextPath(CONTEXT_PATH).build();
     var servletContext = ProxyFactories.createServletContextProxy(servletContextInvocationHandler);
 
@@ -263,7 +263,7 @@ class SessionServletTest {
 
     var requestInvocationHandler = new ServletApiInvocationHandler.Builder()
         .addAttributes(SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE).requestUri(REQUEST_URI)
-        .cookies(List.of(new Cookie(PackageConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
+        .cookies(List.of(new Cookie(ServletConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
         .servletContext(servletContext).build();
     var httpServletRequest = ProxyFactories.createHttpServletRequestProxy(requestInvocationHandler);
 
@@ -296,9 +296,9 @@ class SessionServletTest {
     // assert session key cookie is not set
     Optional<Cookie> maybeHaveSessionKeyCookie =
         responseInvocationHandler.getResponseCookiesView().stream()
-            .filter(c -> c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)).findAny();
+            .filter(c -> c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)).findAny();
     assertFalse(maybeHaveSessionKeyCookie.isPresent(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie set!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie set!");
     assertFalse(responseInvocationHandler.sendRedirectWasCalled(),
         "HttpServletResponse.sendRedirect(String) was called!");
   }
@@ -321,8 +321,8 @@ class SessionServletTest {
 
     var requestInvocationHandler = new ServletApiInvocationHandler.Builder()
         .addAttributes(SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE)
-        .cookies(List.of(new Cookie(PackageConstants.SESSION_KEY_COOKIE_NAME, keyToDestroy),
-            new Cookie(PackageConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
+        .cookies(List.of(new Cookie(ServletConstants.SESSION_KEY_COOKIE_NAME, keyToDestroy),
+            new Cookie(ServletConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
         .addRequestParameters(LOGOUT_REQUEST_PARAMETERS).requestUri(REQUEST_URI)
         .servletContext(servletContext).build();
     var httpServletRequest = ProxyFactories.createHttpServletRequestProxy(requestInvocationHandler);
@@ -355,24 +355,24 @@ class SessionServletTest {
     // assert session key cookie is unset
     Optional<Cookie> maybeHaveSessionKeyCookie =
         responseInvocationHandler.getResponseCookiesView().stream()
-            .filter(c -> c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)).findAny();
+            .filter(c -> c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)).findAny();
     assertTrue(maybeHaveSessionKeyCookie.isPresent(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie not present on destroy!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie not present on destroy!");
     assertNull(maybeHaveSessionKeyCookie.get().getValue(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie value set on destroy!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie value set on destroy!");
     assertEquals(0, maybeHaveSessionKeyCookie.get().getMaxAge(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " has non-zero max age on destroy!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " has non-zero max age on destroy!");
 
     // assert service url cookie is unset
     Optional<Cookie> maybeHaveServiceUrlCookie =
         responseInvocationHandler.getResponseCookiesView().stream()
-            .filter(c -> c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)).findAny();
+            .filter(c -> c.getName().equals(ServletConstants.SERVICE_URL_COOKIE_NAME)).findAny();
     assertTrue(maybeHaveServiceUrlCookie.isPresent(),
-        PackageConstants.SERVICE_URL_COOKIE_NAME + " cookie not present on destroy!");
+        ServletConstants.SERVICE_URL_COOKIE_NAME + " cookie not present on destroy!");
     assertNull(maybeHaveServiceUrlCookie.get().getValue(),
-        PackageConstants.SERVICE_URL_COOKIE_NAME + " cookie value set on destroy!");
+        ServletConstants.SERVICE_URL_COOKIE_NAME + " cookie value set on destroy!");
     assertEquals(0, maybeHaveServiceUrlCookie.get().getMaxAge(),
-        PackageConstants.SERVICE_URL_COOKIE_NAME + " has non-zero max age on destroy!");
+        ServletConstants.SERVICE_URL_COOKIE_NAME + " has non-zero max age on destroy!");
 
     assertTrue(responseInvocationHandler.sendRedirectWasCalled(),
         "HttpServletResponse.sendRedirect(String) was not called!");
@@ -400,8 +400,8 @@ class SessionServletTest {
 
     var requestInvocationHandler = new ServletApiInvocationHandler.Builder()
         .addAttributes(SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE)
-        .cookies(List.of(new Cookie(PackageConstants.SESSION_KEY_COOKIE_NAME, keyToDestroy),
-            new Cookie(PackageConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
+        .cookies(List.of(new Cookie(ServletConstants.SESSION_KEY_COOKIE_NAME, keyToDestroy),
+            new Cookie(ServletConstants.SERVICE_URL_COOKIE_NAME, SERVICE_URL)))
         .addRequestParameters(LOGOUT_REQUEST_PARAMETERS).requestUri(REQUEST_URI)
         .servletContext(servletContext).build();
     var httpServletRequest = ProxyFactories.createHttpServletRequestProxy(requestInvocationHandler);
@@ -435,24 +435,24 @@ class SessionServletTest {
     // assert session key cookie is unset
     Optional<Cookie> maybeHaveSessionKeyCookie =
         responseInvocationHandler.getResponseCookiesView().stream()
-            .filter(c -> c.getName().equals(PackageConstants.SESSION_KEY_COOKIE_NAME)).findAny();
+            .filter(c -> c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)).findAny();
     assertTrue(maybeHaveSessionKeyCookie.isPresent(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie not present on destroy!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie not present on destroy!");
     assertNull(maybeHaveSessionKeyCookie.get().getValue(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " cookie value set on destroy!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " cookie value set on destroy!");
     assertEquals(0, maybeHaveSessionKeyCookie.get().getMaxAge(),
-        PackageConstants.SESSION_KEY_COOKIE_NAME + " has non-zero max age on destroy!");
+        ServletConstants.SESSION_KEY_COOKIE_NAME + " has non-zero max age on destroy!");
 
     // assert service url cookie is unset
     Optional<Cookie> maybeHaveServiceUrlCookie =
         responseInvocationHandler.getResponseCookiesView().stream()
-            .filter(c -> c.getName().equals(PackageConstants.SERVICE_URL_COOKIE_NAME)).findAny();
+            .filter(c -> c.getName().equals(ServletConstants.SERVICE_URL_COOKIE_NAME)).findAny();
     assertTrue(maybeHaveServiceUrlCookie.isPresent(),
-        PackageConstants.SERVICE_URL_COOKIE_NAME + " cookie not present on destroy!");
+        ServletConstants.SERVICE_URL_COOKIE_NAME + " cookie not present on destroy!");
     assertNull(maybeHaveServiceUrlCookie.get().getValue(),
-        PackageConstants.SERVICE_URL_COOKIE_NAME + " cookie value set on destroy!");
+        ServletConstants.SERVICE_URL_COOKIE_NAME + " cookie value set on destroy!");
     assertEquals(0, maybeHaveServiceUrlCookie.get().getMaxAge(),
-        PackageConstants.SERVICE_URL_COOKIE_NAME + " has non-zero max age on destroy!");
+        ServletConstants.SERVICE_URL_COOKIE_NAME + " has non-zero max age on destroy!");
 
     assertFalse(responseInvocationHandler.sendRedirectWasCalled(),
         "HttpServletResponse.sendRedirect(String) was called!");

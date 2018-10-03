@@ -32,7 +32,7 @@ public class AttributesServlet extends HttpServlet {
 
     @SuppressWarnings("unchecked")
     var attrNames = (List<String>) getServletContext()
-        .getAttribute(PackageConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
+        .getAttribute(ServletConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
 
     Map<String, Object> reqAttrs = new HashMap<>();
     for (Iterator<String> reqAttrNames = req.getAttributeNames().asIterator(); reqAttrNames
