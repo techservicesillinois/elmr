@@ -1,7 +1,7 @@
 FROM openjdk:10-jre-slim
 
 ENV REDIS_PORT=6379 \
-    LOGOUT=/Shibboleth.sso/Logout
+    LOGOUT=/auth/Shibboleth.sso/Logout
 
 MAINTAINER Technology Services, University of Illinois Urbana
 
