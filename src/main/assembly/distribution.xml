@@ -57,13 +57,13 @@
   </files>
   <dependencySets>
     <dependencySet>
-      <outputDirectory>webapps/elmr/WEB-INF/lib</outputDirectory>
+      <outputDirectory>webapps/auth#elmr/WEB-INF/lib</outputDirectory>
       <includes>
         <include>edu.illinois.techservices.elmr:*</include>
       </includes>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>webapps/elmr/WEB-INF/lib</outputDirectory>
+      <outputDirectory>webapps/auth#elmr/WEB-INF/lib</outputDirectory>
       <scope>runtime</scope>
       <excludes>
         <exclude>commons-daemon:commons-daemon</exclude>
