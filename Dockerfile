@@ -1,3 +1,15 @@
+FROM maven:3-jdk-10 as builder
+
+COPY src /usr/src/src/
+COPY pom.xml /usr/src/
+WORKDIR /usr/src
+
+RUN mvn package
+RUN mkdir /tmp/dist \
+    && tar xzf target/elmr-distribution.tar.gz -C /tmp/dist
+
+###########################################################
+
 FROM openjdk:10-jre-slim
 
 ENV REDIS_PORT=6379 \
@@ -5,7 +17,7 @@ ENV REDIS_PORT=6379 \
 
 MAINTAINER Technology Services, University of Illinois Urbana
 
-ADD target/elmr-distribution.tar.gz /opt/
+COPY --from=builder /tmp/dist/ /opt/
 RUN apt-get update && apt-get install -y \
       curl \
     && rm -rf /var/lib/apt/lists/* \

@@ -4,9 +4,9 @@
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
 JAR  := target/elmr-distribution.tar.gz
-JSRC := $(call rwildcard,src,*)
+JSRC := pom.xml $(call rwildcard,src,*)
 
-SRCS := Dockerfile $(JAR)
+SRCS := Dockerfile $(JSRC) attribute-map.xml
 IMAGE:= techservicesillinois/elmr
 
 all: image .drone.yml.sig
@@ -15,9 +15,6 @@ image: .image
 .image: $(SRCS)
 	docker build -f Dockerfile -t $(IMAGE) .
 	@touch $@
-
-$(JAR): $(JSRC)
-	mvn package
 
 login:
 	docker login
@@ -37,4 +34,3 @@ pull:
 clean:
 	-docker rmi $(IMAGE)
 	-rm -f .image
-	-mvn clean
