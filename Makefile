@@ -33,4 +33,4 @@ pull:
 
 clean:
 	-docker rmi $(IMAGE)
-	-rm -f .image
+	-rm -f .image .push
