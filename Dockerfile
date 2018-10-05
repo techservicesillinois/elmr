@@ -1,10 +1,13 @@
 FROM maven:3-jdk-10 as builder
 
-COPY src /usr/src/src/
-COPY pom.xml /usr/src/
 WORKDIR /usr/src
 
+COPY pom.xml /usr/src/
+RUN mvn dependency:resolve
+
+COPY src /usr/src/src/
 RUN mvn package
+
 RUN mkdir /tmp/dist \
     && tar xzf target/elmr-distribution.tar.gz -C /tmp/dist
 
