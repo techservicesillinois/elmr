@@ -12,8 +12,15 @@ RUN mkdir /tmp/dist \
     && tar xzf target/elmr-distribution.tar.gz -C /tmp/dist
 
 ###########################################################
+FROM debian:sid as builder1
 
-FROM openjdk:10-jre-slim
+RUN apt-get update \
+  && apt-get install -y wget \
+  && wget -O /tmp/openjdk-11_linux-x64_bin.tar.gz https://download.java.net/java/ga/jdk11/openjdk-11_linux-x64_bin.tar.gz \
+  && tar xzf /tmp/openjdk-11_linux-x64_bin.tar.gz -C /opt \
+  && /opt/jdk-11/bin/jlink --compress=2 --module-path /opt/jdk-11/jmods --add-modules java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.scripting,java.sql,java.xml --output /elmr-jre
+
+FROM debian:sid-slim
 
 ENV REDIS_PORT=6379 \
     LOGOUT=/auth/Shibboleth.sso/Logout \
@@ -21,6 +28,7 @@ ENV REDIS_PORT=6379 \
 
 MAINTAINER Technology Services, University of Illinois Urbana
 
+COPY --from=builder1 /elmr-jre /opt/jre-11
 COPY --from=builder /tmp/dist/ /opt/
 RUN apt-get update && apt-get install -y \
       curl \
@@ -37,7 +45,7 @@ EXPOSE 8009
 HEALTHCHECK CMD curl -sS -o /dev/stderr -I -w "%{http_code}" http://localhost:8080/auth/elmr/attributes \
     | grep -q 302 || exit 1
  
-ENTRYPOINT exec java -cp /opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.jar \
+ENTRYPOINT exec /opt/jre-11/java -cp /opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.jar \
        --add-opens=java.base/java.lang=ALL-UNNAMED \
        --add-opens=java.base/java.io=ALL-UNNAMED \
        --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
