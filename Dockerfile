@@ -1,4 +1,9 @@
-FROM maven:3-jdk-10 as builder
+FROM maven:3-jdk-11-slim as builder
+
+# Install strip so we may remove unnecessary debugging symbols from libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      binutils \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src
 
@@ -11,15 +16,15 @@ RUN mvn package
 RUN mkdir /tmp/dist \
     && tar xzf target/elmr-distribution.tar.gz -C /tmp/dist
 
+RUN jlink --compress=2 --output /tmp/jre \
+    --strip-debug --no-man-pages --no-header-files \
+    --add-modules \
+    java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.scripting,java.sql,java.xml \
+# Running strip on the jvm library cuts the size from 421M to 18M!
+# https://github.com/docker-library/openjdk/issues/217
+    && find /tmp/jre -type f -execdir strip -p --strip-unneeded {} \;
+
 ###########################################################
-FROM debian:sid as builder1
-
-RUN apt-get update \
-  && apt-get install -y wget \
-  && wget -O /tmp/openjdk-11_linux-x64_bin.tar.gz https://download.java.net/java/ga/jdk11/openjdk-11_linux-x64_bin.tar.gz \
-  && tar xzf /tmp/openjdk-11_linux-x64_bin.tar.gz -C /opt \
-  && /opt/jdk-11/bin/jlink --compress=2 --module-path /opt/jdk-11/jmods --add-modules java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.scripting,java.sql,java.xml --output /elmr-jre
-
 FROM debian:sid-slim
 
 ENV REDIS_PORT=6379 \
@@ -28,24 +33,25 @@ ENV REDIS_PORT=6379 \
 
 MAINTAINER Technology Services, University of Illinois Urbana
 
-COPY --from=builder1 /elmr-jre /opt/jre-11
+COPY --from=builder /tmp/jre /opt/jre
 COPY --from=builder /tmp/dist/ /opt/
+
 RUN apt-get update && apt-get install -y \
       curl \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /etc/shibboleth \
     && mkdir -p /opt/elmr/work/Catalina/localhost/elmr \
     && chown -R root:root /opt/elmr/ \
-    && chmod -R ugo+r /opt/elmr/  
-COPY attribute-map.xml /etc/shibboleth/ 
+    && chmod -R ugo+r /opt/elmr/
+COPY attribute-map.xml /etc/shibboleth/
 
 USER nobody
 EXPOSE 8009
 
 HEALTHCHECK CMD curl -sS -o /dev/stderr -I -w "%{http_code}" http://localhost:8080/auth/elmr/attributes \
     | grep -q 302 || exit 1
- 
-ENTRYPOINT exec /opt/jre-11/java -cp /opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.jar \
+
+ENTRYPOINT exec /opt/jre/bin/java -cp /opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.jar \
        --add-opens=java.base/java.lang=ALL-UNNAMED \
        --add-opens=java.base/java.io=ALL-UNNAMED \
        --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
