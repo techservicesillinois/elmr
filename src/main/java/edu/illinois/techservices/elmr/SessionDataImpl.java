@@ -21,13 +21,11 @@ public class SessionDataImpl implements SessionData {
 
   private final CacheKey cacheKey = new SecureRandomCacheKey();
 
-  private final SessionData fallbackImpl;
-
   /**
    * Connects to a Redis store at {@value #DEFAULT_HOSTNAME} on port {@value #DEFAULT_PORT}.
    */
   public SessionDataImpl() {
-    this(DEFAULT_HOSTNAME, DEFAULT_PORT, new InMemorySessionData());
+    this(DEFAULT_HOSTNAME, DEFAULT_PORT);
   }
 
   /**
@@ -36,8 +34,7 @@ public class SessionDataImpl implements SessionData {
    * @param hostname host of the Redis store.
    * @param port     Redis port.
    */
-  public SessionDataImpl(String hostname, int port, SessionData fallbackImpl) {
-    this.fallbackImpl = fallbackImpl;
+  public SessionDataImpl(String hostname, int port) {
     jp = new JedisPool(new JedisPoolConfig(), hostname, port);
     LOGGER.config("Constructed " + SessionDataImpl.class.getName() + " with hostname = " + hostname
         + ", port = " + port);
@@ -70,9 +67,6 @@ public class SessionDataImpl implements SessionData {
         key = cacheKey.generate();
       }
       j.set(key, sessionData);
-    } catch (JedisConnectionException e) {
-      LOGGER.warning("Failed to connect to redis! Using fallback implementation!");
-      return fallbackImpl.save(sessionData);
     }
     return cacheKey.encode(key);
   }
@@ -85,9 +79,6 @@ public class SessionDataImpl implements SessionData {
     String sessionData = null;
     try (Jedis j = jp.getResource()) {
       sessionData = j.get(decodedKey);
-    } catch (JedisConnectionException e) {
-      LOGGER.warning("Failed to connect to redis! Using fallback implementation!");
-      return fallbackImpl.get(key);
     }
     return sessionData;
   }
@@ -99,9 +90,16 @@ public class SessionDataImpl implements SessionData {
     String decodedKey = cacheKey.decode(key);
     try (Jedis j = jp.getResource()) {
       j.del(decodedKey);
+    }
+  }
+
+  @Override
+  public boolean isConnected() {
+    try (Jedis j = jp.getResource()) {
+      var response = j.ping();
+      return response.equalsIgnoreCase("PONG");
     } catch (JedisConnectionException e) {
-      LOGGER.warning("Failed to connect to redis! Using fallback implmentation!");
-      fallbackImpl.destroy(key);
+      return false;
     }
   }
 }

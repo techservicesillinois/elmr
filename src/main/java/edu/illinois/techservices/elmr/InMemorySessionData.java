@@ -35,4 +35,10 @@ public final class InMemorySessionData implements SessionData {
   public void clear() {
     data.clear();
   }
+
+  @Override
+  public boolean isConnected() {
+    // In memory stores are always connected.
+    return true;
+  }
 }

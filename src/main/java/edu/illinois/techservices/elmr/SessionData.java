@@ -45,4 +45,11 @@ public interface SessionData {
    */
   public void destroy(byte[] key);
 
+  /**
+   * Checks for connectivity with the session store.
+   * 
+   * @return {@code true} if the connection is established.
+   */
+  public boolean isConnected();
+
 }

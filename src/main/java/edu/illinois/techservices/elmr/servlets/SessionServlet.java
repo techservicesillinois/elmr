@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,6 +27,8 @@ public class SessionServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1755921268489294474L;
 
+  private static final Logger LOGGER = Logger.getLogger(SessionServlet.class.getName());
+
   @Override
   protected void service(HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
@@ -39,12 +43,20 @@ public class SessionServlet extends HttpServlet {
       }
     } else {
       var serviceUrl = request.getCookies() != null ? getServiceUrl(request.getCookies()) : "";
-      if (serviceUrl == null || serviceUrl.isEmpty()) {
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-            "Redirect back to service was not set. Set a cookie with the name '"
-                + ServletConstants.SERVICE_URL_COOKIE_NAME + "'.");
-      } else if (sessionCreated(request, response)) {
-        response.sendRedirect(serviceUrl);
+      try {
+        if (serviceUrl == null || serviceUrl.isEmpty()) {
+          response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+              "Redirect back to service was not set. Set a cookie with the name '"
+                  + ServletConstants.SERVICE_URL_COOKIE_NAME + "'.");
+        } else if (sessionCreated(request, response)) {
+          response.sendRedirect(serviceUrl);
+        }
+      } catch (RuntimeException e) {
+        // Assume the worst has happened and there is no connection to the session data store.
+        // Set a 503 status, log the exception and return.
+        LOGGER.log(Level.WARNING, "A problem occurred establishing the session.", e);
+        response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+            "Internal failure: could not connect to session data store!");
       }
     }
     return;

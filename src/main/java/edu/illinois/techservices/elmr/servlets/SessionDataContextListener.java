@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import edu.illinois.techservices.elmr.InMemorySessionData;
 import edu.illinois.techservices.elmr.SessionData;
 import edu.illinois.techservices.elmr.SessionDataImpl;
 
@@ -79,9 +78,16 @@ public class SessionDataContextListener implements ServletContextListener {
     }
 
     SessionData sd = (hostname == null || hostname.isEmpty()) ? new SessionDataImpl()
-        : new SessionDataImpl(hostname, port, new InMemorySessionData());
-    sce.getServletContext().setAttribute(ServletConstants.SESSION_DATA_CONTEXT_PARAM_NAME, sd);
-    LOGGER.config("SessionData object configured; access with context property "
-        + ServletConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
+        : new SessionDataImpl(hostname, port);
+    if (sd.isConnected()) {
+      sce.getServletContext().setAttribute(ServletConstants.SESSION_DATA_CONTEXT_PARAM_NAME, sd);
+      LOGGER.config("SessionData object configured; access with context property "
+          + ServletConstants.SESSION_DATA_CONTEXT_PARAM_NAME);
+    } else {
+      LOGGER.severe(
+          "Unable to connect to session data store at " + SessionData.SESSION_DATA_HOSTNAME_SYSPROP
+              + " on port " + SessionData.SESSION_DATA_PORT_SYSPROP + "!");
+      throw new RuntimeException("Failed to establish connection to session data store!");
+    }
   }
 }
