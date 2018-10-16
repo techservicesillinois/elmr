@@ -16,13 +16,13 @@ RUN mvn package
 RUN mkdir /tmp/dist \
     && tar xzf target/elmr-distribution.tar.gz -C /tmp/dist
 
-RUN jlink --compress=2 --output /tmp/jre \
+RUN jlink --compress=2 --output /tmp/dist/jre \
     --strip-debug --no-man-pages --no-header-files \
     --add-modules \
     java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.scripting,java.sql,java.xml \
 # Running strip on the jvm library cuts the size from 421M to 18M!
 # https://github.com/docker-library/openjdk/issues/217
-    && find /tmp/jre -type f -execdir strip -p --strip-unneeded {} \;
+    && find /tmp/dist/jre -type f -execdir strip -p --strip-unneeded {} \;
 
 ###########################################################
 FROM debian:sid-slim
@@ -33,7 +33,6 @@ ENV REDIS_PORT=6379 \
 
 MAINTAINER Technology Services, University of Illinois Urbana
 
-COPY --from=builder /tmp/jre /opt/jre
 COPY --from=builder /tmp/dist/ /opt/
 
 RUN apt-get update && apt-get install -y \
