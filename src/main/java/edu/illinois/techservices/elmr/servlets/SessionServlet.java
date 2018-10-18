@@ -97,6 +97,7 @@ public class SessionServlet extends HttpServlet {
       var json = Json.renderObject(output);
       var key = sd.save(json);
       var cookie = new Cookie(ServletConstants.SESSION_KEY_COOKIE_NAME, new String(key));
+      cookie.setSecure(!isSecureCookiesDisabled());
       cookie.setPath("/");
       response.addCookie(cookie);
       return true;
@@ -160,5 +161,17 @@ public class SessionServlet extends HttpServlet {
     } else {
       response.sendRedirect(logoutUrl);
     }
+  }
+
+  private boolean isSecureCookiesDisabled() {
+    var disableSecureCookies = Boolean.getBoolean(ServletConstants.SESSION_KEY_DISABLE_SECURE);
+    if (!disableSecureCookies) {
+      var disableSecureCookiesValue =
+          getServletContext().getInitParameter(ServletConstants.SESSION_KEY_DISABLE_SECURE);
+      if (disableSecureCookiesValue != null && !disableSecureCookiesValue.isEmpty()) {
+        disableSecureCookies = Boolean.valueOf(disableSecureCookiesValue);
+      }
+    }
+    return disableSecureCookies;
   }
 }

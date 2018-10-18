@@ -42,4 +42,10 @@ final class ServletConstants {
    */
   static final String SESSION_KEY_COOKIE_NAME =
       "__" + ServletConstants.class.getPackageName() + ".sessionKey";
+
+  /**
+   * Name of context parameter and system property to disable secure cookies for local testing.
+   */
+  static final String SESSION_KEY_DISABLE_SECURE =
+      ServletConstants.class.getPackageName() + ".DisableSecureCookies";
 }

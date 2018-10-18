@@ -97,6 +97,7 @@ Property | Description
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.servlets.logoutUrl` | URL to your web ISO's logout. Can be an absolute or relative URL. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
+`edu.illinois.techservices.elmr.servlets.DisableSecureCookies` | If `true`, any cookies set by elmr are not secure. This setting should only be used in development environments. If not set, the value will fall back to a context parameter of the same name ([see below](#setting-context-parameters-in-confcatalinalocalhostelmrxml)).
 `edu.illinois.techservices.elmr.servlets.HtmlRenderer.formattedHtml` | When set to `true`, format output HTML in an indented readable format. This should only be set for development and debugging purposes.
 `edu.illinois.techservices.elmr.servlets.HtmlRenderer.indentSpaces` | When set with the above property, use this value for the indent spaces. The default value is `2`.
 
@@ -111,6 +112,7 @@ Parameter Name | Description
 `edu.illinois.techservices.elmr.SessionData.hostname` | Name of the host running an external datastore for storing attributes. If not set, the value will fall back to a default value of `localhost`.
 `edu.illinois.techservices.elmr.SessionData.port` | Port the external datastore is listening on. If not set, the value will fall back to a default value of `6379`.
 `edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the file will not load and elmr will not recognize that anything in Apache is configured.
+`edu.illinois.techservices.elmr.servlets.DisableSecureCookies` | If `true`, any cookies set by elmr are not secure. This setting should only be used in development environments. If not set, the default is to use secure cookies.
 `edu.illinois.techservices.elmr.servlets.logoutUrl` | URL to your web ISO's logout. Can be an absolute or relative URL. If this isn't set, logout will respond with a `500` status.
 
 These parameters would affect **ALL** contexts (web applications) deployed to the `webapps` directory. Since elmr is the only context, configuring at this level is OK. If you want to override this configuration or deploy more web applications, see the link above about configuring contexts in Tomcat.
