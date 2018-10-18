@@ -6,7 +6,7 @@ rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst 
 JAR  := target/elmr-distribution.tar.gz
 JSRC := pom.xml $(call rwildcard,src,*)
 
-SRCS := Dockerfile $(JSRC) attribute-map.xml
+SRCS := Dockerfile $(JSRC) attribute-map.xml manifest
 IMAGE:= techservicesillinois/elmr
 
 all: image .drone.yml.sig
