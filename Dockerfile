@@ -16,7 +16,8 @@ RUN mkdir /tmp/dist \
 FROM openjdk:10-jre-slim
 
 ENV REDIS_PORT=6379 \
-    LOGOUT=/auth/Shibboleth.sso/Logout
+    LOGOUT=/auth/Shibboleth.sso/Logout \
+    DISABLE_SECURE_COOKIES=false
 
 MAINTAINER Technology Services, University of Illinois Urbana
 
@@ -53,5 +54,6 @@ ENTRYPOINT exec java -cp /opt/elmr/bin/bootstrap.jar:/opt/elmr/bin/tomcat-juli.j
        -Dedu.illinois.techservices.elmr.SessionData.hostname=$REDIS_HOSTNAME \
        -Dedu.illinois.techservices.elmr.SessionData.port=$REDIS_PORT \
        -Dedu.illinois.techservices.elmr.servlets.logoutUrl=$LOGOUT \
+       -Dedu.illinois.techservices.elmr.servlets.DisableSecureCookies=$DISABLE_SECURE_COOKIES \
        org.apache.catalina.startup.Bootstrap \
        start
