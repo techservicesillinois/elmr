@@ -7,6 +7,7 @@
     <Connector executor="elmrThreadPool" port="8009" protocol="AJP/1.3" tomcatAuthentication="false" />
     <Engine name="Catalina" defaultHost="localhost">
       <Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="true">
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="/dev" prefix="stdout" pattern="combined" rotatable="false" />
       </Host>
     </Engine>
   </Service>
