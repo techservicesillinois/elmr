@@ -97,7 +97,16 @@ public class SessionServlet extends HttpServlet {
       var json = Json.renderObject(output);
       var key = sd.save(json);
       var cookie = new Cookie(ServletConstants.SESSION_KEY_COOKIE_NAME, new String(key));
-      cookie.setSecure(!isSecureCookiesDisabled());
+      if (!isSecureCookiesDisabled()) {
+        cookie.setSecure(true);
+        if (!request.isSecure()) {
+          response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+              "Can't set secure cookies for non-HTTPS requests! Set "
+                  + ServletConstants.SESSION_KEY_DISABLE_SECURE
+                  + " as a context parameter or system property and restart the server or use HTTPS.");
+          return false;
+        }
+      }
       cookie.setPath("/");
       response.addCookie(cookie);
       return true;
