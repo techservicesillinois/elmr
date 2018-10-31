@@ -136,18 +136,20 @@ public class SessionServlet extends HttpServlet {
 
     // These cookies may or may not be set at this point. This loop makes sure that if the Cookies
     // are still there that they are destroyed.
-    for (Cookie c : cookies) {
-      if (c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)) {
-        byte[] key = c.getValue().getBytes();
-        sd.destroy(key);
-        response.addCookie(createCookieToUnset(ServletConstants.SESSION_KEY_COOKIE_NAME));
-        sessionKeyCookieDestroyed = true;
-      } else if (c.getName().equals(ServletConstants.SERVICE_URL_COOKIE_NAME)) {
-        response.addCookie(createCookieToUnset(ServletConstants.SERVICE_URL_COOKIE_NAME));
-        serviceUrlCookieDestroyed = true;
-      }
-      if (sessionKeyCookieDestroyed && serviceUrlCookieDestroyed) {
-        break;
+    if (cookies != null) {
+      for (Cookie c : cookies) {
+        if (c.getName().equals(ServletConstants.SESSION_KEY_COOKIE_NAME)) {
+          byte[] key = c.getValue().getBytes();
+          sd.destroy(key);
+          response.addCookie(createCookieToUnset(ServletConstants.SESSION_KEY_COOKIE_NAME));
+          sessionKeyCookieDestroyed = true;
+        } else if (c.getName().equals(ServletConstants.SERVICE_URL_COOKIE_NAME)) {
+          response.addCookie(createCookieToUnset(ServletConstants.SERVICE_URL_COOKIE_NAME));
+          serviceUrlCookieDestroyed = true;
+        }
+        if (sessionKeyCookieDestroyed && serviceUrlCookieDestroyed) {
+          break;
+        }
       }
     }
     // If we get this far, logout has happened.
