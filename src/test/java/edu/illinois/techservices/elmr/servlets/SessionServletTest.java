@@ -14,6 +14,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import edu.illinois.techservices.elmr.InMemorySessionData;
 
 class SessionServletTest {
@@ -59,6 +60,7 @@ class SessionServletTest {
   }
 
   @Test
+  @EnabledIfSystemProperty(named = "edu.illinois.techservices.elmr.redis.CanConnect", matches = "true")
   void testCreateSessionNoRequestParameter() {
     var servletContextInvocationHandler = new ServletApiInvocationHandler.Builder()
         .addAttributes(SERVLET_CONTEXT_ATTRIBUTES).contextPath(CONTEXT_PATH).build();
@@ -128,6 +130,7 @@ class SessionServletTest {
   }
 
   @Test
+  @EnabledIfSystemProperty(named = "edu.illinois.techservices.elmr.redis.CanConnect", matches = "true")
   void testCreateSessionWithRequestParameter() {
     var servletContextInvocationHandler = new ServletApiInvocationHandler.Builder()
         .addAttributes(SERVLET_CONTEXT_ATTRIBUTES).contextPath(CONTEXT_PATH).build();
