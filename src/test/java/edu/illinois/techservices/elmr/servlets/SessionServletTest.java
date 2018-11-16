@@ -52,7 +52,7 @@ class SessionServletTest {
   private static final Map<String, Object> SHIBBOLETH_ATTRIBUTES_REQUEST_ATTRIBUTE =
       Map.of("displayName", "Test User", "uid", "testuser1", "eduPersonPrincipalName",
           "testuser1@example.com", "eduPersonTargetedID", "testuser1@example.com-1234",
-          "eduPersonAffiliation", "person;test;staff");
+          "eduPersonAffiliation", "person;test;staff", "Shib_Session_ID", "test-only");
 
   @AfterEach
   void tearDown() {

@@ -12,6 +12,15 @@ public final class InMemorySessionData implements SessionData {
 
   private final CacheKey cacheKey = new SecureRandomCacheKey();
 
+  public byte[] save(byte[] key, String sessionData) {
+    if (key == null || key.length == 0) {
+      return save(sessionData);
+    } else {
+      data.put(cacheKey.decode(key), sessionData);
+      return key;
+    }
+  }
+
   @Override
   public byte[] save(String sessionData) {
     String key = cacheKey.generate();

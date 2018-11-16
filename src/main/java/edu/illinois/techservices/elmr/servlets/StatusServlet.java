@@ -16,6 +16,8 @@ import edu.illinois.techservices.elmr.SessionData;
 @WebServlet("/status")
 public class StatusServlet extends HttpServlet {
 
+  private static final long serialVersionUID = 7601036418589497112L;
+
   /**
    * Check the status of a connection to the session data store.
    * 
@@ -39,7 +41,8 @@ public class StatusServlet extends HttpServlet {
    * HTTP status code and a message explaining what the method could determine. An example response
    * looks like:
    * 
-   * <pre>{@code 
+   * <pre>
+   * {@code 
    * 
    * HTTP/1.1 503 Service Unavailable 
    * Content-Length: 76 
@@ -50,7 +53,8 @@ public class StatusServlet extends HttpServlet {
    *   "msg": "Could not connect to session data store."
    * }
    * 
-   * }</pre>
+   * }
+   * </pre>
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)

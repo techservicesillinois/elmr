@@ -29,6 +29,23 @@ public class SessionServlet extends HttpServlet {
 
   private static final Logger LOGGER = Logger.getLogger(SessionServlet.class.getName());
 
+  private String uniqueUserIdentifier;
+
+  @Override
+  public void init() {
+    uniqueUserIdentifier = System.getProperty(ServletConstants.UNIQUE_USER_ID_PARAM_NAME);
+
+    if (uniqueUserIdentifier == null || uniqueUserIdentifier.isEmpty()) {
+      uniqueUserIdentifier = getServletContext().getInitParameter(ServletConstants.UNIQUE_USER_ID_PARAM_NAME);
+    }
+
+    if (uniqueUserIdentifier == null || uniqueUserIdentifier.isEmpty()) {
+      uniqueUserIdentifier = ServletConstants.DEFAULT_UNIQUE_USER_ID;
+    }
+
+    LOGGER.config("Unique user identifier attribute name: " + uniqueUserIdentifier);
+  }
+
   @Override
   protected void service(HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
@@ -43,11 +60,17 @@ public class SessionServlet extends HttpServlet {
       }
     } else {
       var serviceUrl = request.getCookies() != null ? getServiceUrl(request.getCookies()) : "";
+
+
       try {
         if (serviceUrl == null || serviceUrl.isEmpty()) {
           response.sendError(HttpServletResponse.SC_BAD_REQUEST,
               "Redirect back to service was not set. Set a cookie with the name '"
                   + ServletConstants.SERVICE_URL_COOKIE_NAME + "'.");
+        } else if (request.getAttribute(uniqueUserIdentifier) == null) {
+          response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+              "Failed to find a request attribute named " + uniqueUserIdentifier
+                  + ". Please check your web server configuration.");
         } else if (sessionCreated(request, response)) {
           response.sendRedirect(serviceUrl);
         }
@@ -95,7 +118,8 @@ public class SessionServlet extends HttpServlet {
       return false;
     } else {
       var json = Json.renderObject(output);
-      var key = sd.save(json);
+      var preComputedKey = request.getAttribute(uniqueUserIdentifier).toString().getBytes();
+      var key = sd.save(preComputedKey, json);
       var cookie = new Cookie(ServletConstants.SESSION_KEY_COOKIE_NAME, new String(key));
       if (!isSecureCookiesDisabled()) {
         cookie.setSecure(true);

@@ -20,6 +20,16 @@ public interface SessionData {
   public static final String SESSION_DATA_PORT_SYSPROP = SessionData.class.getName() + ".port";
 
   /**
+   * Saves the given session data using the pre-computed key returning the key in the form of a byte
+   * array it was saved under.
+   * 
+   * @param preComputedKey a pre-computed key to save the data with.
+   * @param sessionData    data to save.
+   * @return the pre-computed key.
+   */
+  public byte[] save(byte[] preComputedKey, String sessionData);
+
+  /**
    * Saves the given session data returning the key in the form of a byte array it was saved under.
    * 
    * @param sessionData data to save.

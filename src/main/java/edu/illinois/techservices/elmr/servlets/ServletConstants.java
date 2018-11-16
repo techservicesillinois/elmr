@@ -48,4 +48,9 @@ final class ServletConstants {
    */
   static final String SESSION_KEY_DISABLE_SECURE =
       ServletConstants.class.getPackageName() + ".DisableSecureCookies";
+
+  static final String UNIQUE_USER_ID_PARAM_NAME =
+      ServletConstants.class.getPackageName() + ".UniqueUserIdentifier";
+
+  static final String DEFAULT_UNIQUE_USER_ID = "Shib_Session_ID";
 }
