@@ -66,7 +66,7 @@ public class SessionDataImpl implements SessionData {
   }
 
   public byte[] save(byte[] key, String sessionData) {
-    return key;
+    return doSaveReturningKey(key, sessionData);
   }
 
   @Override
