@@ -36,7 +36,8 @@ public class SessionServlet extends HttpServlet {
     uniqueUserIdentifier = System.getProperty(ServletConstants.UNIQUE_USER_ID_PARAM_NAME);
 
     if (uniqueUserIdentifier == null || uniqueUserIdentifier.isEmpty()) {
-      uniqueUserIdentifier = getServletContext().getInitParameter(ServletConstants.UNIQUE_USER_ID_PARAM_NAME);
+      uniqueUserIdentifier =
+          getServletContext().getInitParameter(ServletConstants.UNIQUE_USER_ID_PARAM_NAME);
     }
 
     if (uniqueUserIdentifier == null || uniqueUserIdentifier.isEmpty()) {
@@ -133,6 +134,8 @@ public class SessionServlet extends HttpServlet {
       }
       cookie.setPath("/");
       response.addCookie(cookie);
+      LOGGER.info(
+          "Session " + request.getAttribute(uniqueUserIdentifier).toString() + " established.");
       return true;
     }
   }
@@ -177,6 +180,7 @@ public class SessionServlet extends HttpServlet {
       }
     }
     // If we get this far, logout has happened.
+    LOGGER.info("Session " + request.getAttribute(uniqueUserIdentifier).toString() + " destroyed.");
     return true;
   }
 
