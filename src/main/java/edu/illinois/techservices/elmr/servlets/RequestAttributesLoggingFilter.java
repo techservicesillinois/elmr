@@ -43,8 +43,11 @@ public class RequestAttributesLoggingFilter extends HttpFilter {
     var log = new StringBuilder("{");
     var sj0 = new StringJoiner(", ");
 
-    userAttributes.stream().forEach(userAttribute -> sj0.add(new StringJoiner(": ")
-        .add(userAttribute).add(request.getAttribute(userAttribute).toString()).toString()));
+    userAttributes.stream()
+        .forEach(userAttribute -> sj0.add(new StringJoiner(": ").add(userAttribute)
+            .add((request.getAttribute(userAttribute) == null) ? "null"
+                : request.getAttribute(userAttribute).toString())
+            .toString()));
 
     var uniqueUserId = ElmrParameters.getString(getServletContext(),
         ServletConstants.UNIQUE_USER_ID_PARAM_NAME, ServletConstants.DEFAULT_UNIQUE_USER_ID);
