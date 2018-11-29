@@ -18,5 +18,6 @@
 <Context>
   <!-- TODO: Change the location of attribute map when it is not hardcoded -->
   <!-- <Parameter name="edu.illinois.techservices.elmr.AttributeMapReader.file" value=""/> -->
-  <Parameter name="edu.illinois.techservices.elmr.servlets.ApacheConfig" value="elmr/conf/mod_jk.conf" />
+  <!-- <Parameter name="edu.illinois.techservices.elmr.servlets.ApacheConfig" value="elmr/conf/mod_jk.conf" /> -->
+  <Parameter name="edu.illinois.techservices.elmr.servlets.ApacheConfig" value="/etc/httpd/conf.d/mod_jk.conf" />
 </Context>
