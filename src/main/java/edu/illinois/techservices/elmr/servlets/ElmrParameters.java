@@ -16,7 +16,7 @@ final class ElmrParameters {
     if (paramValue.equals(defaultValue)) {
       LOGGER.config("System property " + name + " not set, checking servlet context parameters.");
       paramValue = sc.getInitParameter(name);
-      if (paramValue != null && !paramValue.isEmpty()) {
+      if (paramValue == null || paramValue.isEmpty()) {
         LOGGER.config("Using default value " + defaultValue + " for " + name + ".");
         paramValue = defaultValue;
       } else {
