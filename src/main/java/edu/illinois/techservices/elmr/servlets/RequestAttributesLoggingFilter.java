@@ -1,6 +1,7 @@
 package edu.illinois.techservices.elmr.servlets;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,15 +36,20 @@ public class RequestAttributesLoggingFilter extends HttpFilter {
   }
 
   private String logRequestAttributes(HttpServletRequest request) {
-    var attrNames = request.getAttributeNames();
-    LOGGER.finest("REMOVE ME attrNames.hasMoreElements() = " + attrNames.hasMoreElements());
+    @SuppressWarnings("unchecked")
+    List<String> userAttributes = (List<String>) getServletContext()
+        .getAttribute(ServletConstants.ATTRIBUTES_CONTEXT_PARAM_NAME);
+
     var log = new StringBuilder("{");
     var sj0 = new StringJoiner(", ");
-    while (attrNames.hasMoreElements()) {
-      var name = attrNames.nextElement();
-      var value = request.getAttribute(name).toString();
-      sj0.add(new StringJoiner(": ").add(name).add(value).toString());
-    }
+
+    userAttributes.stream().forEach(userAttribute -> sj0.add(new StringJoiner(": ")
+        .add(userAttribute).add(request.getAttribute(userAttribute).toString()).toString()));
+
+    var uniqueUserId = ElmrParameters.getString(getServletContext(),
+        ServletConstants.UNIQUE_USER_ID_PARAM_NAME, ServletConstants.DEFAULT_UNIQUE_USER_ID);
+    sj0.add(new StringJoiner(": ").add(uniqueUserId)
+        .add(request.getAttribute(uniqueUserId).toString()).toString());
     return log.append(sj0.toString()).append("}").toString();
-  } 
+  }
 }
