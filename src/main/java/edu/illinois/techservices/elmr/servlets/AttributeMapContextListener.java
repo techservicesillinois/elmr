@@ -45,18 +45,8 @@ public class AttributeMapContextListener implements ServletContextListener {
   public void contextInitialized(ServletContextEvent sce) {
     LOGGER.config("Initializing attribute map ids...");
 
-    var fileLocation = System.getProperty(AttributeMapReader.FILE_SYSPROP);
-    if (fileLocation == null || fileLocation.isEmpty()) {
-      fileLocation = sce.getServletContext().getInitParameter(AttributeMapReader.FILE_SYSPROP);
-      if (fileLocation == null || fileLocation.isEmpty()) {
-        LOGGER.config("Reading file from default location");
-        fileLocation = AttributeMapReader.DEFAULT_FILE_LOCATION;
-      } else {
-        LOGGER.config("Reading file set by context parameter " + AttributeMapReader.FILE_SYSPROP);
-      }
-    } else {
-      LOGGER.config("Reading file set by system property " + AttributeMapReader.FILE_SYSPROP);
-    }
+    var fileLocation = ElmrParameters.getString(sce.getServletContext(),
+        AttributeMapReader.FILE_SYSPROP, AttributeMapReader.DEFAULT_FILE_LOCATION);
 
     LOGGER.config("Caching Shibboleth attributes from file " + fileLocation);
     AttributeMapHandler amh = new AttributeMapHandler();

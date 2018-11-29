@@ -53,4 +53,8 @@ final class ServletConstants {
       ServletConstants.class.getPackageName() + ".UniqueUserIdentifier";
 
   static final String DEFAULT_UNIQUE_USER_ID = "Shib_Session_ID";
+
+  static final String EMPTY_STRING = "";
+
+  static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 }

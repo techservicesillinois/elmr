@@ -33,23 +33,8 @@ public class ApacheConfigFileLoader implements ServletContextListener {
   public void contextInitialized(ServletContextEvent sce) {
     LOGGER.config("Initializing data from Apache config file...");
 
-    var apacheConfigFilename =
-        System.getProperty(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
-    if (apacheConfigFilename == null || apacheConfigFilename.isEmpty()) {
-      apacheConfigFilename = sce.getServletContext()
-          .getInitParameter(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
-      if (apacheConfigFilename == null || apacheConfigFilename.isEmpty()) {
-        LOGGER.warning(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME
-            + " was not set as a system property or context parameter. File will not be loaded.");
-
-      } else {
-        LOGGER.config("Reading file set by context parameter "
-            + ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
-      }
-    } else {
-      LOGGER.config("Reading file set by system property "
-          + ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
-    }
+    var apacheConfigFilename = ElmrParameters.getString(sce.getServletContext(),
+        ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, ServletConstants.EMPTY_STRING);
 
     ApacheConfig acf = null;
     try {
@@ -58,11 +43,10 @@ public class ApacheConfigFileLoader implements ServletContextListener {
           : new ApacheConfig(new FileInputStream(apacheConfigFilename));
     } catch (NullPointerException | FileNotFoundException e) {
       LOGGER.warning("Apache config file not found. Creating an empty Apache config.");
-      acf = new ApacheConfig(new ByteArrayInputStream(new byte[0]));
+      acf = new ApacheConfig(new ByteArrayInputStream(ServletConstants.EMPTY_BYTE_ARRAY));
     }
 
-    sce.getServletContext().setAttribute(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME,
-        acf);
+    sce.getServletContext().setAttribute(ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME, acf);
     LOGGER.config("Apache configuration cached; access with context property "
         + ServletConstants.APACHE_CONFIG_CONTEXT_PARAM_NAME);
   }

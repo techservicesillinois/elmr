@@ -33,17 +33,8 @@ public class SessionServlet extends HttpServlet {
 
   @Override
   public void init() {
-    uniqueUserIdentifier = System.getProperty(ServletConstants.UNIQUE_USER_ID_PARAM_NAME);
-
-    if (uniqueUserIdentifier == null || uniqueUserIdentifier.isEmpty()) {
-      uniqueUserIdentifier =
-          getServletContext().getInitParameter(ServletConstants.UNIQUE_USER_ID_PARAM_NAME);
-    }
-
-    if (uniqueUserIdentifier == null || uniqueUserIdentifier.isEmpty()) {
-      uniqueUserIdentifier = ServletConstants.DEFAULT_UNIQUE_USER_ID;
-    }
-
+    uniqueUserIdentifier = ElmrParameters.getString(getServletContext(),
+        ServletConstants.UNIQUE_USER_ID_PARAM_NAME, ServletConstants.DEFAULT_UNIQUE_USER_ID);
     LOGGER.config("Unique user identifier attribute name: " + uniqueUserIdentifier);
   }
 
@@ -203,14 +194,7 @@ public class SessionServlet extends HttpServlet {
   }
 
   private boolean isSecureCookiesDisabled() {
-    var disableSecureCookies = Boolean.getBoolean(ServletConstants.SESSION_KEY_DISABLE_SECURE);
-    if (!disableSecureCookies) {
-      var disableSecureCookiesValue =
-          getServletContext().getInitParameter(ServletConstants.SESSION_KEY_DISABLE_SECURE);
-      if (disableSecureCookiesValue != null && !disableSecureCookiesValue.isEmpty()) {
-        disableSecureCookies = Boolean.valueOf(disableSecureCookiesValue);
-      }
-    }
-    return disableSecureCookies;
+    return ElmrParameters.getBoolean(getServletContext(),
+        ServletConstants.SESSION_KEY_DISABLE_SECURE, false);
   }
 }

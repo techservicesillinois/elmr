@@ -12,6 +12,13 @@ import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Logs the request attributes used by this application before and after the request is served.
+ * 
+ * <p>
+ * Logging level is set to {@link Level#FINEST FINEST} for the logger with the fully-qualified name
+ * of this class.
+ */
 @WebFilter(servletNames = {"SessionServlet"})
 public class RequestAttributesLoggingFilter extends HttpFilter {
 
@@ -52,7 +59,9 @@ public class RequestAttributesLoggingFilter extends HttpFilter {
     var uniqueUserId = ElmrParameters.getString(getServletContext(),
         ServletConstants.UNIQUE_USER_ID_PARAM_NAME, ServletConstants.DEFAULT_UNIQUE_USER_ID);
     sj0.add(new StringJoiner(": ").add(uniqueUserId)
-        .add(request.getAttribute(uniqueUserId).toString()).toString());
+        .add((request.getAttribute(uniqueUserId) == null) ? "null"
+            : request.getAttribute(uniqueUserId).toString())
+        .toString());
     return log.append(sj0.toString()).append("}").toString();
   }
 }
