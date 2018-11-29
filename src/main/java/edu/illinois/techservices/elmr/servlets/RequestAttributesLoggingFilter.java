@@ -36,13 +36,13 @@ public class RequestAttributesLoggingFilter extends HttpFilter {
 
   private String logRequestAttributes(HttpServletRequest request) {
     var attrNames = request.getAttributeNames();
+    LOGGER.finest("REMOVE ME attrNames.hasMoreElements() = " + attrNames.hasMoreElements());
     var log = new StringBuilder("{");
     var sj0 = new StringJoiner(", ");
     while (attrNames.hasMoreElements()) {
       var name = attrNames.nextElement();
-      var sj1 = new StringJoiner(": ");
       var value = request.getAttribute(name).toString();
-      sj0.add(sj1.add(name).add(value).toString());
+      sj0.add(new StringJoiner(": ").add(name).add(value).toString());
     }
     return log.append(sj0.toString()).append("}").toString();
   } 
