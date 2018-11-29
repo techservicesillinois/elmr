@@ -22,7 +22,7 @@ import edu.illinois.techservices.elmr.SessionData;
 /**
  * Servlet that captures attribute data from Shibboleth to store it.
  */
-@WebServlet("/session")
+@WebServlet(urlPatterns = {"/session"}, name = "SessionServlet")
 public class SessionServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1755921268489294474L;
