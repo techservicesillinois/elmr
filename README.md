@@ -119,7 +119,7 @@ Parameter Name | Description
 `edu.illinois.techservices.elmr.servlets.ApacheConfig` | Full path to an Apache configuration file containing `JkEnvVar` definitions. If not set, the file will not load and elmr will not recognize that anything in Apache is configured.
 `edu.illinois.techservices.elmr.servlets.DisableSecureCookies` | If `true`, any cookies set by elmr are not secure. This setting should only be used in development environments. If not set, the default is to use secure cookies.
 `edu.illinois.techservices.elmr.servlets.logoutUrl` | URL to your web ISO's logout. Can be an absolute or relative URL. If this isn't set, logout will respond with a `500` status.
-`edu.illinois.techservices.elmr.servlets.UniqueUserIdentifier` | Name of a request attribute that will be used as the initial unencoded value of the key for session data. If not set, the value will fall back to a default value of `Shib_Session_ID`.
+`edu.illinois.techservices.elmr.servlets.UniqueUserIdentifier` | Name of a request attribute that will be used as the initial unencoded value of the key for session data. If not set, the value will fall back to a default value of `Shib-Session-ID`.
 
 These parameters would affect **ALL** contexts (web applications) deployed to the `webapps` directory. Since elmr is the only context, configuring at this level is OK. If you want to override this configuration or deploy more web applications, see the link above about configuring contexts in Tomcat.
 

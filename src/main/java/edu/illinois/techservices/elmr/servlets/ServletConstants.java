@@ -52,7 +52,7 @@ final class ServletConstants {
   static final String UNIQUE_USER_ID_PARAM_NAME =
       ServletConstants.class.getPackageName() + ".UniqueUserIdentifier";
 
-  static final String DEFAULT_UNIQUE_USER_ID = "Shib_Session_ID";
+  static final String DEFAULT_UNIQUE_USER_ID = "Shib-Session-ID";
 
   static final String EMPTY_STRING = "";
 
