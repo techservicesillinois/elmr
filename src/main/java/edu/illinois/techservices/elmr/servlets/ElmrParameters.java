@@ -101,7 +101,7 @@ final class ElmrParameters {
     if (paramValue.equals(defaultValue)) {
       LOGGER.config("System property " + name
           + " has the same as the default value, checking servlet context parameters.");
-      paramValue = 
+
       if (sc.getInitParameter(name) == null) {
         paramValue = defaultValue;
       } else {
