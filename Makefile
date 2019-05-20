@@ -7,7 +7,10 @@ JAR  := target/elmr-distribution.tar.gz
 JSRC := pom.xml $(call rwildcard,src,*)
 
 SRCS := Dockerfile $(JSRC) attribute-map.xml manifest
-IMAGE:= techservicesillinois/elmr
+
+TAG ?= $(USER)
+ORG ?= techservicesillinois
+IMAGE := $(ORG)/elmr:$(TAG)
 
 all: image .drone.yml.sig
 
